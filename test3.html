@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Pterodactyl Addons</title>
+<style>
+  :root {
+    --bg: #12151f; --surface: #1b2030; --line: #2c3350;
+    --text: #e8eaf4; --muted: #9aa3c0; --accent: #7aa2ff; --accent-ink: #0d1530;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f3f5fb; --surface: #ffffff; --line: #d6dbec;
+      --text: #161a2e; --muted: #5b6482; --accent: #2f57d8; --accent-ink: #ffffff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    min-height: 100%; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 20px 80px; gap: 20px;
+  }
+  main.has-results { justify-content: flex-start; padding-top: 14vh; }
+  h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; text-align: center; }
+  .sub { margin: 0; color: var(--muted); text-align: center; max-width: 46ch; }
+  .search { width: min(560px, 100%); }
+  input[type=search] {
+    width: 100%; padding: 16px 20px; font: inherit; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; outline: none;
+  }
+  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .list { width: min(560px, 100%); display: grid; gap: 8px; }
+  .item {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    padding: 14px 18px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .item:hover, .item:focus-visible { border-color: var(--accent); outline: none; }
+  .item small { color: var(--muted); }
+  .status { color: var(--muted); text-align: center; }
+  .guide { width: min(640px, 100%); }
+  .back { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 0; margin-bottom: 16px; }
+  .guide h2 { margin: 0 0 4px; font-size: 28px; letter-spacing: -0.01em; }
+  ol { margin: 24px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+  li {
+    counter-increment: s; position: relative; padding: 16px 18px 16px 58px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  li::before {
+    content: counter(s); position: absolute; left: 16px; top: 16px; width: 28px; height: 28px;
+    display: grid; place-items: center; border-radius: 50%; font-weight: 600; font-size: 14px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  li strong { display: block; margin-bottom: 2px; }
+  li p { margin: 0; color: var(--muted); }
+  .cmd { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+  html, body { overflow-x: hidden; max-width: 100%; }
+  main, .guide, .list, .search, ol, li { min-width: 0; max-width: 100%; }
+  .cmd { min-width: 0; }
+  .cmd button.copy { flex-shrink: 0; }
+  .item span { min-width: 0; overflow-wrap: anywhere; }
+  .item small { margin-left: 12px; overflow-wrap: anywhere; text-align: right; }
+  code {
+    flex: 1 1 0; min-width: 0; max-width: 100%; padding: 10px 12px; overflow-x: auto; white-space: nowrap; font: 14px ui-monospace, Menlo, Consolas, monospace;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  }
+  button.copy, a.btn {
+    padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; text-decoration: none; color: var(--accent-ink);
+    background: var(--accent); border: 0; border-radius: 8px;
+  }
+  a.btn { display: inline-block; margin-top: 10px; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* type chooser */
+  .choices { width: min(560px, 100%); display: grid; gap: 12px; }
+  .choice {
+    display: block; width: 100%; padding: 20px 22px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .choice:hover, .choice:focus-visible { border-color: var(--accent); outline: none; }
+  .choice strong { display: block; font-size: 18px; }
+  .choice span { color: var(--muted); font-size: 14px; }
+
+  /* Language Selector Widget */
+  .lang-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
+  .lang-btn {
+    display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line);
+    color: var(--text); padding: 10px 14px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;
+  }
+  .lang-btn:hover { border-color: var(--accent); }
+  .lang-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* Language Modal */
+  .lang-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: grid; place-items: center; z-index: 1100; padding: 20px;
+  }
+  .lang-modal[hidden] { display: none !important; }
+  .lang-dialog {
+    background: var(--surface); border: 1px solid var(--line); width: min(440px, 100%);
+    max-height: 80vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .lang-header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .lang-header h3 { margin: 0; font-size: 18px; }
+  .close-btn { background: none; border: 0; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0; }
+  .close-btn:hover { color: var(--text); }
+  .lang-search-wrap { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .lang-search-wrap input { width: 100%; padding: 10px 14px; font: inherit; font-size: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; color: var(--text); outline: none; }
+  .lang-search-wrap input:focus { border-color: var(--accent); }
+  .lang-list { overflow-y: auto; padding: 8px; display: grid; gap: 4px; max-height: 360px; }
+  .lang-item {
+    background: none; border: 0; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px;
+    color: var(--text); font: inherit; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  }
+  .lang-item:hover, .lang-item:focus { background: var(--line); outline: none; }
+  .lang-item.active { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .lang-item small { opacity: 0.7; font-size: 12px; }
+</style>
+</head>
+<body>
+<main id="main">
+  <!-- Screen 1: choose type -->
+  <section id="choose" style="display:contents">
+    <h1 data-i18n="mainTitle">Free Pterodactyl Addons</h1>
+    <p class="sub" data-i18n="chooseSub">Which version of Pterodactyl are you running?</p>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <!-- Screen 2: search + list -->
+  <section id="home" style="display:contents" hidden>
+    <button class="back" id="backChoose" style="align-self:center"><span data-i18n="changeVersion">&larr; Change version</span></button>
+    <h1 id="homeTitle"></h1>
+    <p class="sub" id="homeSub"></p>
+    <div class="search"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off"></div>
+    <div id="status" class="status">Loading...</div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <!-- Screen 3: install steps -->
+  <section id="guide" class="guide" hidden>
+    <button class="back" id="back"><span data-i18n="backToSearch">Back to search</span></button>
+    <h2 id="gname"></h2>
+    <div class="sub" style="text-align:left" id="gsub"></div>
+    <ol id="steps"></ol>
+  </section>
+</main>
+
+<!-- Bottom-Left Language Selector Widget -->
+<div class="lang-widget">
+  <button class="lang-btn" id="openLangModal" aria-label="Change Language">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    <span id="currentLangLabel">English</span>
+  </button>
+</div>
+
+<!-- Language Selection Modal -->
+<div class="lang-modal" id="langModal" hidden>
+  <div class="lang-dialog">
+    <div class="lang-header">
+      <h3 data-i18n="selectLangTitle">Select Language</h3>
+      <button class="close-btn" id="closeLangModal">&times;</button>
+    </div>
+    <div class="lang-search-wrap">
+      <input type="search" id="langSearch" placeholder="Search language..." data-i18n-placeholder="searchLangPlaceholder" autocomplete="off">
+    </div>
+    <div class="lang-list" id="langList"></div>
+  </div>
+</div>
+
+<script>
+// Universal Offline Language Database (Generates names for thousands of ISO codes instantly via native browser API)
+const ISO_CODES = [
+  "ab","aa","af","ak","sq","am","ar","an","hy","as","av","ae","ay","az","bm","ba","eu","be","bn","bh",
+  "bi","bs","br","bg","my","ca","ch","ce","ny","zh","cu","cv","kw","co","cr","hr","cs","da","dv","nl",
+  "dz","en","eo","et","ee","fo","fj","fi","fr","ff","gl","ka","de","el","gn","gu","ht","ha","he","hz",
+  "hi","ho","hu","ia","id","ie","ga","ig","ik","io","is","it","iu","ja","jv","kl","kn","kr","ks","kk",
+  "km","ki","rw","ky","kv","kg","ko","ku","kj","la","lb","lg","li","ln","lo","lt","lu","lv","gv","mk",
+  "mg","ms","ml","mt","mi","mr","mh","mn","na","nv","nd","ng","ne","no","nb","nn","ii","oc","oj","or",
+  "os","pa","pi","fa","pl","ps","pt","qu","ro","rm","rn","ru","sm","sg","sa","sc","sr","sn","sd","si",
+  "sk","sl","so","st","es","su","sw","ss","sv","tl","ty","tg","ta","tt","te","th","bo","ti","to","ts",
+  "tn","tr","tk","tw","ug","uk","ur","uz","ve","vi","vo","wa","cy","fy","wo","xh","yi","yo","za","zu",
+  "tlh","syr","grc","ang","cop","got","non","arc","jbo","tok","ia","nov","scn","nap","vec","ast","tzm"
+];
+
+let displayNames = null;
+try {
+  displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
+} catch (e) {
+  displayNames = { of: c => c };
+}
+
+const ALL_LANGUAGES = ISO_CODES.map(code => {
+  let name = code;
+  try { name = displayNames.of(code); } catch(e) {}
+  return { code, name: name ? (name.charAt(0).toUpperCase() + name.slice(1)) : code };
+}).sort((a, b) => a.name.localeCompare(b.name));
+
+// Comprehensive Offline Fallback Dictionary for Core Elements
+const TRANSLATIONS = {
+  en: {
+    mainTitle: "Free Pterodactyl Addons", chooseSub: "Which version of Pterodactyl are you running?",
+    changeVersion: "← Change version", backToSearch: "Back to search", searchPlaceholder: "Search",
+    loading: "Loading...", noResults: "No results match that search.", copy: "Copy", copied: "Copied",
+    blueprintLabel: "Blueprints", blueprintBlurb: "For Pterodactyl 1.x with the Blueprint framework",
+    blueprintTitle: "Free Pterodactyl Blueprints", blueprintSub: "Search for a blueprint, click it, and follow the setup steps.",
+    blueprintEmpty: "Nothing here yet. The dev is too lazy to upload the blueprints.", blueprintWhere: "Follow these steps on the server that runs your panel.",
+    v2Label: "Pterodactyl v2 Extensions", v2Blurb: "For Pterodactyl 2.0 (built-in extensions, installed from a URL)",
+    v2Title: "Free Pterodactyl v2 Extensions", v2Sub: "Search for an extension, click it, and follow the setup steps.",
+    v2Empty: "Nothing here yet. The dev is too lazy to upload the extensions.", v2Where: "Pterodactyl 2.0 is in beta. Try this on a test panel first.",
+    selectLangTitle: "Select Language", searchLangPlaceholder: "Search language...", downloadBtn: "Download",
+    steps: {
+      bp1Title: "Back up your panel", bp1Desc: "Make a backup of your panel files and database before installing any extension.",
+      bp2Title: "Check the file is safe", bp2Desc: "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code.",
+      bp3Title: "Go to your panel folder", bp3Desc: "Connect to your server over SSH and open the Pterodactyl directory.",
+      bp4Title: "Download the blueprint", bp4Desc: "Download it straight onto the server, or download it here and upload it to the panel folder yourself.",
+      bp5Title: "Install it", bp5Desc: "Run the Blueprint installer with the extension name.",
+      bp6Title: "Check it worked", bp6Desc: "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed."
+    }
+  },
+  es: {
+    mainTitle: "Complementos Gratis para Pterodactyl", chooseSub: "¿Qué versión de Pterodactyl estás ejecutando?",
+    changeVersion: "← Cambiar versión", backToSearch: "Volver a la búsqueda", searchPlaceholder: "Buscar",
+    loading: "Cargando...", noResults: "No hay resultados para esa búsqueda.", copy: "Copiar", copied: "Copiado",
+    blueprintLabel: "Blueprints", blueprintBlurb: "Para Pterodactyl 1.x con el framework Blueprint",
+    blueprintTitle: "Blueprints Gratis para Pterodactyl", blueprintSub: "Busca un blueprint y sigue los pasos.",
+    blueprintEmpty: "Aún no hay nada aquí.", blueprintWhere: "Sigue estos pasos en el servidor.",
+    v2Label: "Extensiones Pterodactyl v2", v2Blurb: "Para Pterodactyl 2.0",
+    v2Title: "Extensiones Gratis Pterodactyl v2", v2Sub: "Busca una extensión.",
+    v2Empty: "Aún no hay nada aquí.", v2Where: "Pterodactyl 2.0 está en beta.",
+    selectLangTitle: "Seleccionar Idioma", searchLangPlaceholder: "Buscar idioma...", downloadBtn: "Descargar",
+    steps: {
+      bp1Title: "Haz una copia de seguridad", bp1Desc: "Haz una copia de seguridad de tus archivos y base de datos.",
+      bp2Title: "Verifica que el archivo sea seguro", bp2Desc: "Analiza el archivo con VirusTotal.",
+      bp3Title: "Ve a la carpeta de tu panel", bp3Desc: "Conéctate a tu servidor por SSH.",
+      bp4Title: "Descarga el blueprint", bp4Desc: "Descárgalo directamente en el servidor.",
+      bp5Title: "Instálalo", bp5Desc: "Ejecuta el instalador de Blueprint.",
+      bp6Title: "Comprueba que funcionó", bp6Desc: "Abre tu panel de administración."
+    }
+  },
+  fr: {
+    mainTitle: "Addons Pterodactyl Gratuits", chooseSub: "Quelle version de Pterodactyl utilisez-vous ?",
+    changeVersion: "← Changer de version", backToSearch: "Retour à la recherche", searchPlaceholder: "Rechercher",
+    loading: "Chargement...", noResults: "Aucun résultat trouvé.", copy: "Copier", copied: "Copié",
+    blueprintLabel: "Blueprints", blueprintBlurb: "Pour Pterodactyl 1.x",
+    blueprintTitle: "Blueprints Pterodactyl Gratuits", blueprintSub: "Recherchez un blueprint.",
+    blueprintEmpty: "Rien ici.", blueprintWhere: "Suivez ces étapes sur le serveur.",
+    v2Label: "Extensions Pterodactyl v2", v2Blurb: "Pour Pterodactyl 2.0",
+    v2Title: "Extensions Pterodactyl v2 Gratuites", v2Sub: "Recherchez une extension.",
+    v2Empty: "Rien ici.", v2Where: "Pterodactyl 2.0 est en version bêta.",
+    selectLangTitle: "Choisir la langue", searchLangPlaceholder: "Rechercher une langue...", downloadBtn: "Télécharger",
+    steps: {
+      bp1Title: "Sauvegardez votre panel", bp1Desc: "Faites une sauvegarde.",
+      bp2Title: "Vérifiez que le fichier est sûr", bp2Desc: "Analysez avec VirusTotal.",
+      bp3Title: "Allez dans le dossier", bp3Desc: "Connectez-vous en SSH.",
+      bp4Title: "Téléchargez", bp4Desc: "Téléchargez directement.",
+      bp5Title: "Installez", bp5Desc: "Exécutez l'installateur.",
+      bp6Title: "Vérifiez", bp6Desc: "Ouvrez le panneau d'administration."
+    }
+  },
+  de: {
+    mainTitle: "Kostenlose Pterodactyl Addons", chooseSub: "Welche Pterodactyl-Version verwendest du?",
+    changeVersion: "← Version wechseln", backToSearch: "Zurück zur Suche", searchPlaceholder: "Suchen",
+    loading: "Laden...", noResults: "Keine Ergebnisse gefunden.", copy: "Kopieren", copied: "Kopiert",
+    blueprintLabel: "Blueprints", blueprintBlurb: "Für Pterodactyl 1.x",
+    blueprintTitle: "Kostenlose Pterodactyl Blueprints", blueprintSub: "Suche nach einem Blueprint.",
+    blueprintEmpty: "Noch nichts hier.", blueprintWhere: "Befolge diese Schritte auf dem Server.",
+    v2Label: "Pterodactyl v2 Erweiterungen", v2Blurb: "Für Pterodactyl 2.0",
+    v2Title: "Kostenlose Pterodactyl v2 Erweiterungen", v2Sub: "Suche nach einer Erweiterung.",
+    v2Empty: "Noch nichts hier.", v2Where: "Pterodactyl 2.0 ist in der Beta.",
+    selectLangTitle: "Sprache auswählen", searchLangPlaceholder: "Sprache suchen...", downloadBtn: "Herunterladen",
+    steps: {
+      bp1Title: "Panel sichern", bp1Desc: "Erstelle ein Backup.",
+      bp2Title: "Sicherheit prüfen", bp2Desc: "Mit VirusTotal scannen.",
+      bp3Title: "Zum Ordner wechseln", bp3Desc: "Per SSH verbinden.",
+      bp4Title: "Herunterladen", bp4Desc: "Direkt herunterladen.",
+      bp5Title: "Installieren", bp5Desc: "Installationsprogramm ausführen.",
+      bp6Title: "Überprüfen", bp6Desc: "Admin-Panel öffnen."
+    }
+  }
+};
+
+let currentLang = localStorage.getItem('pterodactyl_lang') || (navigator.language || 'en').split('-')[0];
+if (!TRANSLATIONS[currentLang]) currentLang = 'en'; // Fallback gracefully for any obscure offline code
+
+function t(key) {
+  if (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) return TRANSLATIONS[currentLang][key];
+  return TRANSLATIONS['en'][key] || key;
+}
+
+function tStep(stepKey) {
+  const dict = TRANSLATIONS[currentLang]?.steps || TRANSLATIONS['en'].steps;
+  return dict[stepKey] || TRANSLATIONS['en'].steps[stepKey] || {};
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.innerHTML = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.placeholder = t(key);
+  });
+  const currentObj = ALL_LANGUAGES.find(l => l.code === currentLang);
+  document.getElementById('currentLangLabel').textContent = currentObj ? currentObj.name : currentLang.toUpperCase();
+}
+
+// GitHub repo details
+let OWNER = "";
+let REPO  = "";
+(function () {
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    OWNER = host.split(".")[0];
+    const first = location.pathname.split("/").filter(Boolean)[0];
+    REPO = first || host;
+  }
+})();
+const PANEL_DIR = "/var/www/pterodactyl";
+
+const TYPES = {
+  blueprint: {
+    get label() { return t('blueprintLabel'); },
+    get blurb() { return t('blueprintBlurb'); },
+    get title() { return t('blueprintTitle'); },
+    get sub() { return t('blueprintSub'); },
+    folder: "blueprints",
+    ext: ".blueprint",
+    get empty() { return t('blueprintEmpty'); },
+    get where() { return t('blueprintWhere'); },
+    fallback: [],
+    steps: b => [
+      [tStep('bp1Title').title || "Back up your panel", tStep('bp1Desc').desc || "Make a backup."],
+      [tStep('bp2Title').title || "Check the file is safe", tStep('bp2Desc').desc || "Scan file."],
+      [tStep('bp3Title').title || "Go to your panel folder", (tStep('bp3Desc').desc || "Open folder.") + cmdBlock(`cd ${PANEL_DIR}`)],
+      [tStep('bp4Title').title || "Download the blueprint", (tStep('bp4Desc').desc || "Download.") + cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">${t('downloadBtn')} ${b.file}</a>`],
+      [tStep('bp5Title').title || "Install it", (tStep('bp5Desc').desc || "Install.") + cmdBlock(`blueprint -install ${b.id}`)],
+      [tStep('bp6Title').title || "Check it worked", tStep('bp6Desc').desc || "Verify."]
+    ]
+  },
+  v2: {
+    get label() { return t('v2Label'); },
+    get blurb() { return t('v2Blurb'); },
+    get title() { return t('v2Title'); },
+    get sub() { return t('v2Sub'); },
+    folder: "extensions",
+    ext: "",
+    get empty() { return t('v2Empty'); },
+    get where() { return t('v2Where'); },
+    fallback: [],
+    steps: b => [
+      ["Back up your panel", "Make a backup of your panel files and database."],
+      ["Check the file is safe", "Scan it with VirusTotal."],
+      ["Copy the extension URL", "v2 installs extensions from a URL." + cmdBlock(b.url) + `<a class="btn" href="${b.url}">${t('downloadBtn')} ${b.file}</a>`],
+      ["Open the extensions page", "Log in to your panel as an admin."],
+      ["Install from URL", "Choose install from URL and paste link."],
+      ["Check it worked", "Verify it on the Extensions page."]
+    ]
+  }
+};
+
+const $ = id => document.getElementById(id);
+let current = null;
+let items = [];
+
+function pretty(file) { return file.replace(/\.[^.]+$/, ""); }
+
+function show(screen) {
+  $("choose").hidden = screen !== "choose";
+  $("home").hidden = screen !== "home";
+  $("guide").hidden = screen !== "guide";
+  $("main").classList.toggle("has-results", screen === "home" && items.length > 0);
+  window.scrollTo(0, 0);
+}
+
+function buildChoices() {
+  $("choices").innerHTML = "";
+  Object.keys(TYPES).forEach(key => {
+    const tItem = TYPES[key];
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = "<strong></strong><span></span>";
+    btn.querySelector("strong").textContent = tItem.label;
+    btn.querySelector("span").textContent = tItem.blurb;
+    btn.onclick = () => pick(key);
+    $("choices").appendChild(btn);
+  });
+}
+
+async function pick(key) {
+  current = TYPES[key];
+  items = [];
+  $("homeTitle").textContent = current.title;
+  $("homeSub").textContent = current.sub;
+  $("q").value = "";
+  $("q").placeholder = t('searchPlaceholder');
+  $("list").innerHTML = "";
+  $("status").textContent = t('loading');
+  show("home");
+  $("q").focus();
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${current.folder}`);
+    if (!res.ok) throw new Error(res.status);
+    const files = await res.json();
+    items = files
+      .filter(f => f.type === "file" && !f.name.startsWith(".") && !/^readme/i.test(f.name) &&
+        (!current.ext || f.name.toLowerCase().endsWith(current.ext)))
+      .map(f => ({ id: pretty(f.name), file: f.name, url: f.download_url }));
+  } catch (e) {
+    items = current.fallback.map(b => ({ id: b.name, file: b.name + current.ext, url: b.url }));
+  }
+  items.sort((a, b) => a.id.localeCompare(b.id));
+  render();
+}
+
+function render() {
+  const term = $("q").value.trim().toLowerCase();
+  const hits = items.filter(b => b.id.toLowerCase().includes(term));
+  const list = $("list");
+  list.innerHTML = "";
+  $("main").classList.toggle("has-results", hits.length > 0 && items.length > 0);
+  if (!items.length) {
+    $("status").textContent = current.empty;
+    return;
+  }
+  $("status").textContent = hits.length ? "" : t('noResults');
+  hits.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "item";
+    btn.innerHTML = `<span></span><small></small>`;
+    btn.firstChild.textContent = b.id;
+    btn.lastChild.textContent = b.file;
+    btn.onclick = () => openGuide(b);
+    list.appendChild(btn);
+  });
+}
+
+function cmdBlock(text) {
+  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return `<div class="cmd"><code>${safe}</code><button class="copy" data-copy="${safe}">${t('copy')}</button></div>`;
+}
+
+function openGuide(b) {
+  $("gname").textContent = b.id;
+  $("gsub").textContent = current.where;
+  $("steps").innerHTML = current.steps(b).map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
+  show("guide");
+  $("main").classList.remove("has-results");
+}
+
+// Language Picker Modal Logic
+function renderLangList(filter = "") {
+  const container = $('langList');
+  container.innerHTML = "";
+  const query = filter.toLowerCase();
+  const filtered = ALL_LANGUAGES.filter(l => l.name.toLowerCase().includes(query) || l.code.toLowerCase().includes(query));
+
+  filtered.forEach(lang => {
+    const btn = document.createElement("button");
+    btn.className = `lang-item ${lang.code === currentLang ? 'active' : ''}`;
+    btn.innerHTML = `<span>${lang.name}</span><small>${lang.code}</small>`;
+    btn.onclick = () => {
+      currentLang = lang.code;
+      localStorage.setItem('pterodactyl_lang', currentLang);
+      applyTranslations();
+      buildChoices();
+      closeModal();
+      if (!($("home").hidden) && current) {
+        $("homeTitle").textContent = current.title;
+        $("homeSub").textContent = current.sub;
+        render();
+      }
+    };
+    container.appendChild(btn);
+  });
+}
+
+function openModal() {
+  $('langModal').hidden = false;
+  $('langSearch').value = "";
+  renderLangList();
+  $('langSearch'].focus(); // fixed selector syntax
+}
+
+function closeModal() {
+  $('langModal').hidden = true;
+}
+
+$('openLangModal').onclick = openModal;
+$('closeLangModal').onclick = closeModal;
+$('langModal').onclick = e => { if (e.target === $('langModal')) closeModal(); };$('langSearch').addEventListener('input', e => renderLangList(e.target.value));
+
+$("back").onclick = () => { show("home"); render(); };
+$("backChoose").onclick = () => show("choose");
+$("q").addEventListener("input", render);
+
+document.addEventListener("click", e => {
+  const tBtn = e.target.closest("[data-copy]");
+  if (!tBtn) return;
+  const txt = new DOMParser().parseFromString(tBtn.dataset.copy, "text/html").documentElement.textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    tBtn.textContent = t('copied');
+    setTimeout(() => tBtn.textContent = t('copy'), 1500);
+  });
+});
+
+// Initialize
+applyTranslations();
+buildChoices();
+show("choose");
+</script>
+</body>
+</html>
