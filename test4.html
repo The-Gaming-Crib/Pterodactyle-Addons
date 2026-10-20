@@ -129,24 +129,24 @@
 <main id="main">
   <!-- Screen 1: choose type -->
   <section id="choose" style="display:contents">
-    <h1 data-i18n="mainTitle">Free Pterodactyl Addons</h1>
-    <p class="sub" data-i18n="chooseSub">Which version of Pterodactyl are you running?</p>
+    <h1 data-i18n="Free Pterodactyl Addons">Free Pterodactyl Addons</h1>
+    <p class="sub" data-i18n="Which version of Pterodactyl are you running?">Which version of Pterodactyl are you running?</p>
     <div class="choices" id="choices"></div>
   </section>
 
   <!-- Screen 2: search + list -->
   <section id="home" style="display:contents" hidden>
-    <button class="back" id="backChoose" style="align-self:center"><span data-i18n="changeVersion">&larr; Change version</span></button>
+    <button class="back" id="backChoose" style="align-self:center"><span data-i18n="&larr; Change version">&larr; Change version</span></button>
     <h1 id="homeTitle"></h1>
     <p class="sub" id="homeSub"></p>
-    <div class="search"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off"></div>
+    <div class="search"><input id="q" type="search" placeholder="Search" data-i18n-ph="Search" aria-label="Search" autocomplete="off"></div>
     <div id="status" class="status">Loading...</div>
     <div id="list" class="list"></div>
   </section>
 
   <!-- Screen 3: install steps -->
   <section id="guide" class="guide" hidden>
-    <button class="back" id="back"><span data-i18n="backToSearch">Back to search</span></button>
+    <button class="back" id="back"><span data-i18n="Back to search">Back to search</span></button>
     <h2 id="gname"></h2>
     <div class="sub" style="text-align:left" id="gsub"></div>
     <ol id="steps"></ol>
@@ -165,29 +165,25 @@
 <div class="lang-modal" id="langModal" hidden>
   <div class="lang-dialog">
     <div class="lang-header">
-      <h3 data-i18n="selectLangTitle">Select Language</h3>
+      <h3 data-i18n="Select Language">Select Language</h3>
       <button class="close-btn" id="closeLangModal">&times;</button>
     </div>
     <div class="lang-search-wrap">
-      <input type="search" id="langSearch" placeholder="Search language..." data-i18n-placeholder="searchLangPlaceholder" autocomplete="off">
+      <input type="search" id="langSearch" placeholder="Search language..." data-i18n-ph="Search language..." autocomplete="off">
     </div>
     <div class="lang-list" id="langList"></div>
   </div>
 </div>
 
 <script>
-// Universal Offline Language Database (Generates names for thousands of ISO codes instantly via native browser API)
+// ISO Standard Language List (Every language tag)
 const ISO_CODES = [
-  "ab","aa","af","ak","sq","am","ar","an","hy","as","av","ae","ay","az","bm","ba","eu","be","bn","bh",
-  "bi","bs","br","bg","my","ca","ch","ce","ny","zh","cu","cv","kw","co","cr","hr","cs","da","dv","nl",
-  "dz","en","eo","et","ee","fo","fj","fi","fr","ff","gl","ka","de","el","gn","gu","ht","ha","he","hz",
-  "hi","ho","hu","ia","id","ie","ga","ig","ik","io","is","it","iu","ja","jv","kl","kn","kr","ks","kk",
-  "km","ki","rw","ky","kv","kg","ko","ku","kj","la","lb","lg","li","ln","lo","lt","lu","lv","gv","mk",
-  "mg","ms","ml","mt","mi","mr","mh","mn","na","nv","nd","ng","ne","no","nb","nn","ii","oc","oj","or",
-  "os","pa","pi","fa","pl","ps","pt","qu","ro","rm","rn","ru","sm","sg","sa","sc","sr","sn","sd","si",
-  "sk","sl","so","st","es","su","sw","ss","sv","tl","ty","tg","ta","tt","te","th","bo","ti","to","ts",
-  "tn","tr","tk","tw","ug","uk","ur","uz","ve","vi","vo","wa","cy","fy","wo","xh","yi","yo","za","zu",
-  "tlh","syr","grc","ang","cop","got","non","arc","jbo","tok","ia","nov","scn","nap","vec","ast","tzm"
+  "af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","ny","zh","zh-TW","co","hr","cs","da",
+  "nl","en","eo","et","tl","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu",
+  "is","ig","id","ga","it","ja","jw","kn","kk","km","rw","ko","ku","ky","lo","la","lv","lt","lb","mk",
+  "mg","ms","ml","mt","mi","mr","mn","my","ne","no","or","ps","fa","pl","pt","pa","ro","ru","sm","gd",
+  "sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tg","ta","tt","te","th","tr","tk","uk",
+  "ur","ug","uz","vi","cy","xh","yi","yo","zu"
 ];
 
 let displayNames = null;
@@ -203,117 +199,39 @@ const ALL_LANGUAGES = ISO_CODES.map(code => {
   return { code, name: name ? (name.charAt(0).toUpperCase() + name.slice(1)) : code };
 }).sort((a, b) => a.name.localeCompare(b.name));
 
-// Comprehensive Offline Fallback Dictionary for Core Elements
-const TRANSLATIONS = {
-  en: {
-    mainTitle: "Free Pterodactyl Addons", chooseSub: "Which version of Pterodactyl are you running?",
-    changeVersion: "← Change version", backToSearch: "Back to search", searchPlaceholder: "Search",
-    loading: "Loading...", noResults: "No results match that search.", copy: "Copy", copied: "Copied",
-    blueprintLabel: "Blueprints", blueprintBlurb: "For Pterodactyl 1.x with the Blueprint framework",
-    blueprintTitle: "Free Pterodactyl Blueprints", blueprintSub: "Search for a blueprint, click it, and follow the setup steps.",
-    blueprintEmpty: "Nothing here yet. The dev is too lazy to upload the blueprints.", blueprintWhere: "Follow these steps on the server that runs your panel.",
-    v2Label: "Pterodactyl v2 Extensions", v2Blurb: "For Pterodactyl 2.0 (built-in extensions, installed from a URL)",
-    v2Title: "Free Pterodactyl v2 Extensions", v2Sub: "Search for an extension, click it, and follow the setup steps.",
-    v2Empty: "Nothing here yet. The dev is too lazy to upload the extensions.", v2Where: "Pterodactyl 2.0 is in beta. Try this on a test panel first.",
-    selectLangTitle: "Select Language", searchLangPlaceholder: "Search language...", downloadBtn: "Download",
-    steps: {
-      bp1Title: "Back up your panel", bp1Desc: "Make a backup of your panel files and database before installing any extension.",
-      bp2Title: "Check the file is safe", bp2Desc: "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code.",
-      bp3Title: "Go to your panel folder", bp3Desc: "Connect to your server over SSH and open the Pterodactyl directory.",
-      bp4Title: "Download the blueprint", bp4Desc: "Download it straight onto the server, or download it here and upload it to the panel folder yourself.",
-      bp5Title: "Install it", bp5Desc: "Run the Blueprint installer with the extension name.",
-      bp6Title: "Check it worked", bp6Desc: "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed."
-    }
-  },
-  es: {
-    mainTitle: "Complementos Gratis para Pterodactyl", chooseSub: "¿Qué versión de Pterodactyl estás ejecutando?",
-    changeVersion: "← Cambiar versión", backToSearch: "Volver a la búsqueda", searchPlaceholder: "Buscar",
-    loading: "Cargando...", noResults: "No hay resultados para esa búsqueda.", copy: "Copiar", copied: "Copiado",
-    blueprintLabel: "Blueprints", blueprintBlurb: "Para Pterodactyl 1.x con el framework Blueprint",
-    blueprintTitle: "Blueprints Gratis para Pterodactyl", blueprintSub: "Busca un blueprint y sigue los pasos.",
-    blueprintEmpty: "Aún no hay nada aquí.", blueprintWhere: "Sigue estos pasos en el servidor.",
-    v2Label: "Extensiones Pterodactyl v2", v2Blurb: "Para Pterodactyl 2.0",
-    v2Title: "Extensiones Gratis Pterodactyl v2", v2Sub: "Busca una extensión.",
-    v2Empty: "Aún no hay nada aquí.", v2Where: "Pterodactyl 2.0 está en beta.",
-    selectLangTitle: "Seleccionar Idioma", searchLangPlaceholder: "Buscar idioma...", downloadBtn: "Descargar",
-    steps: {
-      bp1Title: "Haz una copia de seguridad", bp1Desc: "Haz una copia de seguridad de tus archivos y base de datos.",
-      bp2Title: "Verifica que el archivo sea seguro", bp2Desc: "Analiza el archivo con VirusTotal.",
-      bp3Title: "Ve a la carpeta de tu panel", bp3Desc: "Conéctate a tu servidor por SSH.",
-      bp4Title: "Descarga el blueprint", bp4Desc: "Descárgalo directamente en el servidor.",
-      bp5Title: "Instálalo", bp5Desc: "Ejecuta el instalador de Blueprint.",
-      bp6Title: "Comprueba que funcionó", bp6Desc: "Abre tu panel de administración."
-    }
-  },
-  fr: {
-    mainTitle: "Addons Pterodactyl Gratuits", chooseSub: "Quelle version de Pterodactyl utilisez-vous ?",
-    changeVersion: "← Changer de version", backToSearch: "Retour à la recherche", searchPlaceholder: "Rechercher",
-    loading: "Chargement...", noResults: "Aucun résultat trouvé.", copy: "Copier", copied: "Copié",
-    blueprintLabel: "Blueprints", blueprintBlurb: "Pour Pterodactyl 1.x",
-    blueprintTitle: "Blueprints Pterodactyl Gratuits", blueprintSub: "Recherchez un blueprint.",
-    blueprintEmpty: "Rien ici.", blueprintWhere: "Suivez ces étapes sur le serveur.",
-    v2Label: "Extensions Pterodactyl v2", v2Blurb: "Pour Pterodactyl 2.0",
-    v2Title: "Extensions Pterodactyl v2 Gratuites", v2Sub: "Recherchez une extension.",
-    v2Empty: "Rien ici.", v2Where: "Pterodactyl 2.0 est en version bêta.",
-    selectLangTitle: "Choisir la langue", searchLangPlaceholder: "Rechercher une langue...", downloadBtn: "Télécharger",
-    steps: {
-      bp1Title: "Sauvegardez votre panel", bp1Desc: "Faites une sauvegarde.",
-      bp2Title: "Vérifiez que le fichier est sûr", bp2Desc: "Analysez avec VirusTotal.",
-      bp3Title: "Allez dans le dossier", bp3Desc: "Connectez-vous en SSH.",
-      bp4Title: "Téléchargez", bp4Desc: "Téléchargez directement.",
-      bp5Title: "Installez", bp5Desc: "Exécutez l'installateur.",
-      bp6Title: "Vérifiez", bp6Desc: "Ouvrez le panneau d'administration."
-    }
-  },
-  de: {
-    mainTitle: "Kostenlose Pterodactyl Addons", chooseSub: "Welche Pterodactyl-Version verwendest du?",
-    changeVersion: "← Version wechseln", backToSearch: "Zurück zur Suche", searchPlaceholder: "Suchen",
-    loading: "Laden...", noResults: "Keine Ergebnisse gefunden.", copy: "Kopieren", copied: "Kopiert",
-    blueprintLabel: "Blueprints", blueprintBlurb: "Für Pterodactyl 1.x",
-    blueprintTitle: "Kostenlose Pterodactyl Blueprints", blueprintSub: "Suche nach einem Blueprint.",
-    blueprintEmpty: "Noch nichts hier.", blueprintWhere: "Befolge diese Schritte auf dem Server.",
-    v2Label: "Pterodactyl v2 Erweiterungen", v2Blurb: "Für Pterodactyl 2.0",
-    v2Title: "Kostenlose Pterodactyl v2 Erweiterungen", v2Sub: "Suche nach einer Erweiterung.",
-    v2Empty: "Noch nichts hier.", v2Where: "Pterodactyl 2.0 ist in der Beta.",
-    selectLangTitle: "Sprache auswählen", searchLangPlaceholder: "Sprache suchen...", downloadBtn: "Herunterladen",
-    steps: {
-      bp1Title: "Panel sichern", bp1Desc: "Erstelle ein Backup.",
-      bp2Title: "Sicherheit prüfen", bp2Desc: "Mit VirusTotal scannen.",
-      bp3Title: "Zum Ordner wechseln", bp3Desc: "Per SSH verbinden.",
-      bp4Title: "Herunterladen", bp4Desc: "Direkt herunterladen.",
-      bp5Title: "Installieren", bp5Desc: "Installationsprogramm ausführen.",
-      bp6Title: "Überprüfen", bp6Desc: "Admin-Panel öffnen."
-    }
-  }
-};
-
 let currentLang = localStorage.getItem('pterodactyl_lang') || (navigator.language || 'en').split('-')[0];
-if (!TRANSLATIONS[currentLang]) currentLang = 'en'; // Fallback gracefully for any obscure offline code
+const translationCache = {};
 
-function t(key) {
-  if (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) return TRANSLATIONS[currentLang][key];
-  return TRANSLATIONS['en'][key] || key;
+async function fetchTranslation(text, targetLang) {
+  if (targetLang === 'en') return text;
+  const cacheKey = `${targetLang}:${text}`;
+  if (translationCache[cacheKey]) return translationCache[cacheKey];
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`);
+    const data = await res.json();
+    if (data && data.responseData && data.responseData.translatedText) {
+      translationCache[cacheKey] = data.responseData.translatedText;
+      return data.responseData.translatedText;
+    }
+  } catch (e) {}
+  return text;
 }
 
-function tStep(stepKey) {
-  const dict = TRANSLATIONS[currentLang]?.steps || TRANSLATIONS['en'].steps;
-  return dict[stepKey] || TRANSLATIONS['en'].steps[stepKey] || {};
-}
-
-function applyTranslations() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.innerHTML = t(key);
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    el.placeholder = t(key);
-  });
+async function applyTranslations() {
+  const elements = document.querySelectorAll('[data-i18n]');
+  for (const el of elements) {
+    const src = el.getAttribute('data-i18n');
+    el.innerHTML = await fetchTranslation(src, currentLang);
+  }
+  const placeholders = document.querySelectorAll('[data-i18n-ph]');
+  for (const el of placeholders) {
+    const src = el.getAttribute('data-i18n-ph');
+    el.placeholder = await fetchTranslation(src, currentLang);
+  }
   const currentObj = ALL_LANGUAGES.find(l => l.code === currentLang);
   document.getElementById('currentLangLabel').textContent = currentObj ? currentObj.name : currentLang.toUpperCase();
 }
 
-// GitHub repo details
 let OWNER = "";
 let REPO  = "";
 (function () {
@@ -328,41 +246,43 @@ const PANEL_DIR = "/var/www/pterodactyl";
 
 const TYPES = {
   blueprint: {
-    get label() { return t('blueprintLabel'); },
-    get blurb() { return t('blueprintBlurb'); },
-    get title() { return t('blueprintTitle'); },
-    get sub() { return t('blueprintSub'); },
+    label: "Blueprints",
+    blurb: "For Pterodactyl 1.x with the Blueprint framework",
+    title: "Free Pterodactyl Blueprints",
+    sub: "Search for a blueprint, click it, and follow the setup steps.",
     folder: "blueprints",
     ext: ".blueprint",
-    get empty() { return t('blueprintEmpty'); },
-    get where() { return t('blueprintWhere'); },
+    empty: "Nothing here yet. The dev is too lazy to upload the blueprints.",
+    where: "Follow these steps on the server that runs your panel.",
     fallback: [],
     steps: b => [
-      [tStep('bp1Title').title || "Back up your panel", tStep('bp1Desc').desc || "Make a backup."],
-      [tStep('bp2Title').title || "Check the file is safe", tStep('bp2Desc').desc || "Scan file."],
-      [tStep('bp3Title').title || "Go to your panel folder", (tStep('bp3Desc').desc || "Open folder.") + cmdBlock(`cd ${PANEL_DIR}`)],
-      [tStep('bp4Title').title || "Download the blueprint", (tStep('bp4Desc').desc || "Download.") + cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">${t('downloadBtn')} ${b.file}</a>`],
-      [tStep('bp5Title').title || "Install it", (tStep('bp5Desc').desc || "Install.") + cmdBlock(`blueprint -install ${b.id}`)],
-      [tStep('bp6Title').title || "Check it worked", tStep('bp6Desc').desc || "Verify."]
+      ["Back up your panel", "Make a backup of your panel files and database before installing any extension."],
+      ["Check the file is safe", "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code."],
+      ["Go to your panel folder", "Connect to your server over SSH and open the Pterodactyl directory." + cmdBlock(`cd ${PANEL_DIR}`)],
+      ["Download the blueprint", "Download it straight onto the server, or download it here and upload it to the panel folder yourself." +
+        cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Install it", "Run the Blueprint installer with the extension name." + cmdBlock(`blueprint -install ${b.id}`)],
+      ["Check it worked", "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed."]
     ]
   },
   v2: {
-    get label() { return t('v2Label'); },
-    get blurb() { return t('v2Blurb'); },
-    get title() { return t('v2Title'); },
-    get sub() { return t('v2Sub'); },
+    label: "Pterodactyl v2 Extensions",
+    blurb: "For Pterodactyl 2.0 (built-in extensions, installed from a URL)",
+    title: "Free Pterodactyl v2 Extensions",
+    sub: "Search for an extension, click it, and follow the setup steps.",
     folder: "extensions",
     ext: "",
-    get empty() { return t('v2Empty'); },
-    get where() { return t('v2Where'); },
+    empty: "Nothing here yet. The dev is too lazy to upload the extensions.",
+    where: "Pterodactyl 2.0 is in beta. Try this on a test panel first.",
     fallback: [],
     steps: b => [
-      ["Back up your panel", "Make a backup of your panel files and database."],
-      ["Check the file is safe", "Scan it with VirusTotal."],
-      ["Copy the extension URL", "v2 installs extensions from a URL." + cmdBlock(b.url) + `<a class="btn" href="${b.url}">${t('downloadBtn')} ${b.file}</a>`],
-      ["Open the extensions page", "Log in to your panel as an admin."],
-      ["Install from URL", "Choose install from URL and paste link."],
-      ["Check it worked", "Verify it on the Extensions page."]
+      ["Back up your panel", "Make a backup of your panel files and database. Pterodactyl 2.0 is still in beta, so test on a copy of your panel first."],
+      ["Check the file is safe", "Optional but recommended: scan it with VirusTotal or ask an AI to review the code."],
+      ["Copy the extension URL", "v2 installs extensions from a URL, so you don't need to upload anything to the server." +
+        cmdBlock(b.url) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Open the extensions page", "Log in to your panel as an admin and open the Extensions page in the admin area."],
+      ["Install from URL", "Choose the option to install from a URL, paste the link from step 3 and confirm."],
+      ["Check it worked", "The extension should now be listed on the Extensions page."]
     ]
   }
 };
@@ -381,29 +301,28 @@ function show(screen) {
   window.scrollTo(0, 0);
 }
 
-function buildChoices() {
+async function buildChoices() {
   $("choices").innerHTML = "";
-  Object.keys(TYPES).forEach(key => {
+  for (const key of Object.keys(TYPES)) {
     const tItem = TYPES[key];
     const btn = document.createElement("button");
     btn.className = "choice";
     btn.innerHTML = "<strong></strong><span></span>";
-    btn.querySelector("strong").textContent = tItem.label;
-    btn.querySelector("span").textContent = tItem.blurb;
+    btn.querySelector("strong").textContent = await fetchTranslation(tItem.label, currentLang);
+    btn.querySelector("span").textContent = await fetchTranslation(tItem.blurb, currentLang);
     btn.onclick = () => pick(key);
     $("choices").appendChild(btn);
-  });
+  }
 }
 
 async function pick(key) {
   current = TYPES[key];
   items = [];
-  $("homeTitle").textContent = current.title;
-  $("homeSub").textContent = current.sub;
+  $("homeTitle").textContent = await fetchTranslation(current.title, currentLang);
+  $("homeSub").textContent = await fetchTranslation(current.sub, currentLang);
   $("q").value = "";
-  $("q").placeholder = t('searchPlaceholder');
   $("list").innerHTML = "";
-  $("status").textContent = t('loading');
+  $("status").textContent = await fetchTranslation("Loading...", currentLang);
   show("home");
   $("q").focus();
   try {
@@ -421,17 +340,17 @@ async function pick(key) {
   render();
 }
 
-function render() {
+async function render() {
   const term = $("q").value.trim().toLowerCase();
   const hits = items.filter(b => b.id.toLowerCase().includes(term));
   const list = $("list");
   list.innerHTML = "";
   $("main").classList.toggle("has-results", hits.length > 0 && items.length > 0);
   if (!items.length) {
-    $("status").textContent = current.empty;
+    $("status").textContent = await fetchTranslation(current.empty, currentLang);
     return;
   }
-  $("status").textContent = hits.length ? "" : t('noResults');
+  $("status").textContent = hits.length ? "" : await fetchTranslation("No results match that search.", currentLang);
   hits.forEach(b => {
     const btn = document.createElement("button");
     btn.className = "item";
@@ -445,18 +364,24 @@ function render() {
 
 function cmdBlock(text) {
   const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-  return `<div class="cmd"><code>${safe}</code><button class="copy" data-copy="${safe}">${t('copy')}</button></div>`;
+  return `<div class="cmd"><code>${safe}</code><button class="copy" data-copy="${safe}">Copy</button></div>`;
 }
 
-function openGuide(b) {
+async function openGuide(b) {
   $("gname").textContent = b.id;
-  $("gsub").textContent = current.where;
-  $("steps").innerHTML = current.steps(b).map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
+  $("gsub").textContent = await fetchTranslation(current.where, currentLang);
+  const stepsData = current.steps(b);
+  const renderedSteps = [];
+  for (const s of stepsData) {
+    const title = await fetchTranslation(s[0], currentLang);
+    const desc = await fetchTranslation(s[1], currentLang);
+    renderedSteps.push(`<li><strong>${title}</strong><p>${desc}</p></li>`);
+  }
+  $("steps").innerHTML = renderedSteps.join("");
   show("guide");
   $("main").classList.remove("has-results");
 }
 
-// Language Picker Modal Logic
 function renderLangList(filter = "") {
   const container = $('langList');
   container.innerHTML = "";
@@ -467,15 +392,15 @@ function renderLangList(filter = "") {
     const btn = document.createElement("button");
     btn.className = `lang-item ${lang.code === currentLang ? 'active' : ''}`;
     btn.innerHTML = `<span>${lang.name}</span><small>${lang.code}</small>`;
-    btn.onclick = () => {
+    btn.onclick = async () => {
       currentLang = lang.code;
       localStorage.setItem('pterodactyl_lang', currentLang);
-      applyTranslations();
-      buildChoices();
+      await applyTranslations();
+      await buildChoices();
       closeModal();
       if (!($("home").hidden) && current) {
-        $("homeTitle").textContent = current.title;
-        $("homeSub").textContent = current.sub;
+        $("homeTitle").textContent = await fetchTranslation(current.title, currentLang);
+        $("homeSub").textContent = await fetchTranslation(current.sub, currentLang);
         render();
       }
     };
@@ -487,7 +412,7 @@ function openModal() {
   $('langModal').hidden = false;
   $('langSearch').value = "";
   renderLangList();
-  $('langSearch'].focus(); // fixed selector syntax
+  $('langSearch').focus();
 }
 
 function closeModal() {
@@ -507,12 +432,11 @@ document.addEventListener("click", e => {
   if (!tBtn) return;
   const txt = new DOMParser().parseFromString(tBtn.dataset.copy, "text/html").documentElement.textContent;
   navigator.clipboard.writeText(txt).then(() => {
-    tBtn.textContent = t('copied');
-    setTimeout(() => tBtn.textContent = t('copy'), 1500);
+    tBtn.textContent = "Copied";
+    setTimeout(() => tBtn.textContent = "Copy", 1500);
   });
 });
 
-// Initialize
 applyTranslations();
 buildChoices();
 show("choose");
