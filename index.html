@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free Pterodactyl Blueprints</title>
+<title>Free Pterodactyl Extensions</title>
 <style>
   :root {
     --bg: #12151f; --surface: #1b2030; --line: #2c3350;
@@ -76,22 +76,42 @@
   a.btn { display: inline-block; margin-top: 10px; }
   button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   [hidden] { display: none !important; }
+
+  /* type chooser */
+  .choices { width: min(560px, 100%); display: grid; gap: 12px; }
+  .choice {
+    display: block; width: 100%; padding: 20px 22px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .choice:hover, .choice:focus-visible { border-color: var(--accent); outline: none; }
+  .choice strong { display: block; font-size: 18px; }
+  .choice span { color: var(--muted); font-size: 14px; }
 </style>
 </head>
 <body>
 <main id="main">
-  <section id="home" style="display:contents">
-    <h1>Free Pterodactyl Blueprints</h1>
-    <p class="sub">Search for an extension, click it, and follow the setup steps.</p>
-    <div class="search"><input id="q" type="search" placeholder="Search blueprints" aria-label="Search blueprints" autocomplete="off" autofocus></div>
-    <div id="status" class="status">Loading blueprints...</div>
+  <!-- Screen 1: choose type -->
+  <section id="choose" style="display:contents">
+    <h1>Free Pterodactyl Extensions</h1>
+    <p class="sub">Which version of Pterodactyl are you running?</p>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <!-- Screen 2: search + list -->
+  <section id="home" style="display:contents" hidden>
+    <button class="back" id="backChoose" style="align-self:center">&larr; Change version</button>
+    <h1 id="homeTitle"></h1>
+    <p class="sub" id="homeSub"></p>
+    <div class="search"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off"></div>
+    <div id="status" class="status">Loading...</div>
     <div id="list" class="list"></div>
   </section>
 
+  <!-- Screen 3: install steps -->
   <section id="guide" class="guide" hidden>
     <button class="back" id="back">Back to search</button>
     <h2 id="gname"></h2>
-    <div class="sub" style="text-align:left">Follow these steps on the server that runs your panel.</div>
+    <div class="sub" style="text-align:left" id="gsub"></div>
     <ol id="steps"></ol>
   </section>
 </main>
@@ -110,93 +130,161 @@ let REPO  = "";
     REPO = first || host; // user site: repo is named username.github.io
   }
 })();
-// Folder in the repo that holds the .blueprint files
-const FOLDER = "blueprints";
 // Panel location on your server (change if yours is different)
 const PANEL_DIR = "/var/www/pterodactyl";
-// Used only if the GitHub lookup fails: [{ name: "example", url: "https://..." }]
-const FALLBACK = [];
+
+// ---- THE TWO TYPES ----
+// folder   = folder in the repo that holds the files
+// ext      = file extension to list (empty = list every file in the folder)
+// steps    = function(item) returning [title, text-with-optional-command-blocks]
+// fallback = used only if the GitHub lookup fails: [{ name: "example", url: "https://..." }]
+const TYPES = {
+  blueprint: {
+    label: "Blueprints",
+    blurb: "For Pterodactyl 1.x with the Blueprint framework",
+    title: "Free Pterodactyl Blueprints",
+    sub: "Search for a blueprint, click it, and follow the setup steps.",
+    folder: "blueprints",
+    ext: ".blueprint",
+    empty: "Nothing here yet. The dev is too lazy to upload it.",
+    where: "Follow these steps on the server that runs your panel.",
+    fallback: [],
+    steps: b => [
+      ["Back up your panel", "Make a backup of your panel files and database before installing any extension."],
+      ["Check the file is safe", "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code."],
+      ["Go to your panel folder", "Connect to your server over SSH and open the Pterodactyl directory." + cmdBlock(`cd ${PANEL_DIR}`)],
+      ["Download the blueprint", "Download it straight onto the server, or download it here and upload it to the panel folder yourself." +
+        cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Install it", "Run the Blueprint installer with the extension name." + cmdBlock(`blueprint -install ${b.id}`)],
+      ["Check it worked", "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed. If something looks wrong, run the install command again and read any error it prints."]
+    ]
+  },
+  v2: {
+    label: "Pterodactyl v2 Extensions",
+    blurb: "For Pterodactyl 2.0 (built-in extensions, installed from a URL)",
+    title: "Free Pterodactyl v2 Extensions",
+    sub: "Search for an extension, click it, and follow the setup steps.",
+    folder: "extensions",
+    ext: "",
+    empty: "Nothing here yet. The dev is too lazy to upload it.",
+    where: "Pterodactyl 2.0 is in beta. Try this on a test panel first.",
+    fallback: [],
+    steps: b => [
+      ["Back up your panel", "Make a backup of your panel files and database. Pterodactyl 2.0 is still in beta, so test on a copy of your panel first."],
+      ["Check the file is safe", "Optional but recommended: scan it with VirusTotal or ask an AI to review the code."],
+      ["Copy the extension URL", "v2 installs extensions from a URL, so you don't need to upload anything to the server." +
+        cmdBlock(b.url) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Open the extensions page", "Log in to your panel as an admin and open the Extensions page in the admin area."],
+      ["Install from URL", "Choose the option to install from a URL, paste the link from step 3 and confirm."],
+      ["Check it worked", "The extension should now be listed on the Extensions page. If it fails to install, the panel shows an error. A broken extension can't take the panel down, so you can just remove it."]
+    ]
+  }
+};
 // ------------------------------
 
 const $ = id => document.getElementById(id);
-let blueprints = [];
+let current = null;
+let items = [];
 
-function pretty(file) { return file.replace(/\.blueprint$/i, ""); }
+function pretty(file) { return file.replace(/\.[^.]+$/, ""); }
 
-async function load() {
+function show(screen) {
+  $("choose").hidden = screen !== "choose";
+  $("home").hidden = screen !== "home";
+  $("guide").hidden = screen !== "guide";
+  $("main").classList.toggle("has-results", screen === "home" && items.length > 0);
+  window.scrollTo(0, 0);
+}
+
+function buildChoices() {
+  $("choices").innerHTML = "";
+  Object.keys(TYPES).forEach(key => {
+    const t = TYPES[key];
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = "<strong></strong><span></span>";
+    btn.querySelector("strong").textContent = t.label;
+    btn.querySelector("span").textContent = t.blurb;
+    btn.onclick = () => pick(key);
+    $("choices").appendChild(btn);
+  });
+}
+
+async function pick(key) {
+  current = TYPES[key];
+  items = [];
+  $("homeTitle").textContent = current.title;
+  $("homeSub").textContent = current.sub;
+  $("q").value = "";
+  $("list").innerHTML = "";
+  $("status").textContent = "Loading...";
+  show("home");
+  $("q").focus();
   try {
-    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`);
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${current.folder}`);
     if (!res.ok) throw new Error(res.status);
     const files = await res.json();
-    blueprints = files
-      .filter(f => f.type === "file" && /\.blueprint$/i.test(f.name))
+    items = files
+      .filter(f => f.type === "file" && !f.name.startsWith(".") && !/^readme/i.test(f.name) &&
+        (!current.ext || f.name.toLowerCase().endsWith(current.ext)))
       .map(f => ({ id: pretty(f.name), file: f.name, url: f.download_url }));
   } catch (e) {
-    blueprints = FALLBACK.map(b => ({ id: b.name, file: b.name + ".blueprint", url: b.url }));
+    items = current.fallback.map(b => ({ id: b.name, file: b.name + current.ext, url: b.url }));
   }
-  blueprints.sort((a, b) => a.id.localeCompare(b.id));
+  items.sort((a, b) => a.id.localeCompare(b.id));
   render();
 }
 
 function render() {
   const term = $("q").value.trim().toLowerCase();
-  const hits = blueprints.filter(b => b.id.toLowerCase().includes(term));
+  const hits = items.filter(b => b.id.toLowerCase().includes(term));
   const list = $("list");
   list.innerHTML = "";
-  $("main").classList.toggle("has-results", hits.length > 0 && blueprints.length > 0);
-  if (!blueprints.length) {
-    $("status").textContent = "Could not load the blueprint list. Check the OWNER and REPO values at the top of this file.";
+  $("main").classList.toggle("has-results", hits.length > 0 && items.length > 0);
+  if (!items.length) {
+    $("status").textContent = current.empty;
     return;
   }
-  $("status").textContent = hits.length ? "" : "No blueprints match that search.";
+  $("status").textContent = hits.length ? "" : "No results match that search.";
   hits.forEach(b => {
     const btn = document.createElement("button");
     btn.className = "item";
-    btn.innerHTML = `<span></span><small>${b.file}</small>`;
+    btn.innerHTML = `<span></span><small></small>`;
     btn.firstChild.textContent = b.id;
+    btn.lastChild.textContent = b.file;
     btn.onclick = () => openGuide(b);
     list.appendChild(btn);
   });
 }
 
 function cmdBlock(text) {
-  return `<div class="cmd"><code>${text}</code><button class="copy" data-copy="${text.replace(/"/g, "&quot;")}">Copy</button></div>`;
+  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return `<div class="cmd"><code>${safe}</code><button class="copy" data-copy="${safe}">Copy</button></div>`;
 }
 
 function openGuide(b) {
   $("gname").textContent = b.id;
-  const steps = [
-    ["Back up your panel", "Make a backup of your panel files and database before installing any extension."],
-    ["Check the file is safe", "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code."],
-    ["Go to your panel folder", "Connect to your server over SSH and open the Pterodactyl directory." + cmdBlock(`cd ${PANEL_DIR}`)],
-    ["Download the blueprint", "Download it straight onto the server, or download it here and upload it to the panel folder yourself." +
-      cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
-    ["Install it", "Run the Blueprint installer with the extension name." + cmdBlock(`blueprint -install ${b.id}`)],
-    ["Check it worked", "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed. If something looks wrong, run the install command again and read any error it prints."]
-  ];
-  $("steps").innerHTML = steps.map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
-  $("home").hidden = true;
-  $("guide").hidden = false;
+  $("gsub").textContent = current.where;
+  $("steps").innerHTML = current.steps(b).map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
+  show("guide");
   $("main").classList.remove("has-results");
-  window.scrollTo(0, 0);
 }
 
-$("back").onclick = () => {
-  $("guide").hidden = true;
-  $("home").hidden = false;
-  render();
-};
+$("back").onclick = () => { show("home"); render(); };
+$("backChoose").onclick = () => show("choose");
 $("q").addEventListener("input", render);
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-copy]");
   if (!t) return;
-  navigator.clipboard.writeText(t.dataset.copy).then(() => {
+  const txt = new DOMParser().parseFromString(t.dataset.copy, "text/html").documentElement.textContent;
+  navigator.clipboard.writeText(txt).then(() => {
     t.textContent = "Copied";
     setTimeout(() => t.textContent = "Copy", 1500);
   });
 });
 
-load();
+buildChoices();
+show("choose");
 </script>
 </body>
 </html>
