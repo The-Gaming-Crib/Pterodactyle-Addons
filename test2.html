@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Pterodactyl Addons</title>
+<style>
+  :root {
+    --bg: #12151f; --surface: #1b2030; --line: #2c3350;
+    --text: #e8eaf4; --muted: #9aa3c0; --accent: #7aa2ff; --accent-ink: #0d1530;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f3f5fb; --surface: #ffffff; --line: #d6dbec;
+      --text: #161a2e; --muted: #5b6482; --accent: #2f57d8; --accent-ink: #ffffff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    top: 0 !important; /* Hide Google Translate top banner shift */
+  }
+  main {
+    min-height: 100%; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 20px 80px; gap: 20px;
+  }
+  main.has-results { justify-content: flex-start; padding-top: 14vh; }
+  h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -0.02em; text-align: center; }
+  .sub { margin: 0; color: var(--muted); text-align: center; max-width: 46ch; }
+  .search { width: min(560px, 100%); }
+  input[type=search] {
+    width: 100%; padding: 16px 20px; font: inherit; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; outline: none;
+  }
+  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .list { width: min(560px, 100%); display: grid; gap: 8px; }
+  .item {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    padding: 14px 18px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .item:hover, .item:focus-visible { border-color: var(--accent); outline: none; }
+  .item small { color: var(--muted); }
+  .status { color: var(--muted); text-align: center; }
+  .guide { width: min(640px, 100%); }
+  .back { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 0; margin-bottom: 16px; }
+  .guide h2 { margin: 0 0 4px; font-size: 28px; letter-spacing: -0.01em; }
+  ol { margin: 24px 0 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+  li {
+    counter-increment: s; position: relative; padding: 16px 18px 16px 58px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  }
+  li::before {
+    content: counter(s); position: absolute; left: 16px; top: 16px; width: 28px; height: 28px;
+    display: grid; place-items: center; border-radius: 50%; font-weight: 600; font-size: 14px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  li strong { display: block; margin-bottom: 2px; }
+  li p { margin: 0; color: var(--muted); }
+  .cmd { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+  html, body { overflow-x: hidden; max-width: 100%; }
+  main, .guide, .list, .search, ol, li { min-width: 0; max-width: 100%; }
+  .cmd { min-width: 0; }
+  .cmd button.copy { flex-shrink: 0; }
+  .item span { min-width: 0; overflow-wrap: anywhere; }
+  .item small { margin-left: 12px; overflow-wrap: anywhere; text-align: right; }
+  code {
+    flex: 1 1 0; min-width: 0; max-width: 100%; padding: 10px 12px; overflow-x: auto; white-space: nowrap; font: 14px ui-monospace, Menlo, Consolas, monospace;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  }
+  button.copy, a.btn {
+    padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; text-decoration: none; color: var(--accent-ink);
+    background: var(--accent); border: 0; border-radius: 8px;
+  }
+  a.btn { display: inline-block; margin-top: 10px; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* type chooser */
+  .choices { width: min(560px, 100%); display: grid; gap: 12px; }
+  .choice {
+    display: block; width: 100%; padding: 20px 22px; font: inherit; color: var(--text); text-align: left; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .choice:hover, .choice:focus-visible { border-color: var(--accent); outline: none; }
+  .choice strong { display: block; font-size: 18px; }
+  .choice span { color: var(--muted); font-size: 14px; }
+
+  /* Bottom Left Floating Language Widget */
+  .lang-widget {
+    position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+  }
+  .lang-btn {
+    display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line);
+    color: var(--text); padding: 10px 14px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: border-color 0.2s, transform 0.1s;
+  }
+  .lang-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .lang-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* Language Modal Popup */
+  .lang-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px);
+    display: grid; place-items: center; z-index: 10000; padding: 20px;
+  }
+  .lang-dialog {
+    background: var(--surface); border: 1px solid var(--line); width: min(440px, 100%);
+    max-height: 80vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .lang-header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .lang-header h3 { margin: 0; font-size: 18px; }
+  .close-btn { background: none; border: 0; color: var(--muted); font-size: 22px; cursor: pointer; padding: 0; }
+  .close-btn:hover { color: var(--text); }
+  .lang-search-wrap { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .lang-search-wrap input {
+    width: 100%; padding: 10px 14px; font: inherit; font-size: 14px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px; color: var(--text); outline: none;
+  }
+  .lang-search-wrap input:focus { border-color: var(--accent); }
+  .lang-list { overflow-y: auto; padding: 8px; display: grid; gap: 4px; max-height: 380px; }
+  .lang-item {
+    background: none; border: 0; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px;
+    color: var(--text); font: inherit; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  }
+  .lang-item:hover, .lang-item:focus { background: var(--line); outline: none; }
+  .lang-item.active { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .lang-item small { opacity: 0.7; font-size: 12px; }
+
+  /* Hide Google Translate attribution bar */
+  .goog-te-banner-frame, .skiptranslate, #goog-gt-tt { display: none !important; }
+  body { top: 0px !important; }
+</style>
+</head>
+<body>
+
+<main id="main">
+  <!-- Screen 1: choose type -->
+  <section id="choose" style="display:contents">
+    <h1>Free Pterodactyl Addons</h1>
+    <p class="sub">Which version of Pterodactyl are you running?</p>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <!-- Screen 2: search + list -->
+  <section id="home" style="display:contents" hidden>
+    <button class="back" id="backChoose" style="align-self:center">&larr; Change version</button>
+    <h1 id="homeTitle"></h1>
+    <p class="sub" id="homeSub"></p>
+    <div class="search"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off"></div>
+    <div id="status" class="status">Loading...</div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <!-- Screen 3: install steps -->
+  <section id="guide" class="guide" hidden>
+    <button class="back" id="back">Back to search</button>
+    <h2 id="gname"></h2>
+    <div class="sub" style="text-align:left" id="gsub"></div>
+    <ol id="steps"></ol>
+  </section>
+</main>
+
+<!-- Bottom-Left Floating Language Button -->
+<div class="lang-widget">
+  <button class="lang-btn" id="openLangModal" aria-label="Change Language">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    <span id="currentLangLabel">Language</span>
+  </button>
+</div>
+
+<!-- Language Selection Search Dialog -->
+<div class="lang-modal" id="langModal" hidden>
+  <div class="lang-dialog">
+    <div class="lang-header">
+      <h3>Select Language</h3>
+      <button class="close-btn" id="closeLangModal">&times;</button>
+    </div>
+    <div class="lang-search-wrap">
+      <input type="search" id="langSearch" placeholder="Search thousands of languages..." autocomplete="off">
+    </div>
+    <div class="lang-list" id="langList"></div>
+  </div>
+</div>
+
+<!-- Hidden Google Translate Mount Point -->
+<div id="google_translate_element" style="display:none"></div>
+
+<script>
+// ---- ISO 639 Universal Language Codes Database ----
+// Includes modern, ancient, extinct, constructed, regional, and rare dialects
+const ISO_LANG_CODES = [
+  "af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","ny","zh","zh-TW","co","hr","cs","da",
+  "nl","en","eo","et","tl","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","iw","hi","hmn","hu",
+  "is","ig","id","ga","it","ja","jw","kn","kk","km","rw","ko","ku","ky","lo","la","lv","lt","lb","mk",
+  "mg","ms","ml","mt","mi","mr","mn","my","ne","no","or","ps","fa","pl","pt","pa","ro","ru","sm","gd",
+  "sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tg","ta","tt","te","th","tr","tk","uk",
+  "ur","ug","uz","vi","cy","xh","yi","yo","zu","syr","grc","ang","cop","san","got","non","arc","tsv",
+  "tlh","ia","jbo","vo","tok","io","nov","scn","nap","vec","ast","an","oc","co","rm","fur","lad","tzm"
+];
+
+// Initialize Browser-Native Display Names API
+let displayNames = null;
+try {
+  displayNames = new Intl.DisplayNames([navigator.language || 'en'], { type: 'language' });
+} catch (e) {
+  displayNames = { of: code => code };
+}
+
+// Build list of all recognized languages
+const ALL_LANGUAGES = ISO_LANG_CODES.map(code => {
+  let name = code;
+  try { name = displayNames.of(code); } catch(e) {}
+  return { code, name: name || code };
+}).sort((a,b) => a.name.localeCompare(b.name));
+
+let selectedLang = localStorage.getItem('app_lang_code') || (navigator.language || 'en').split('-')[0];
+
+function updateLangLabel() {
+  const match = ALL_LANGUAGES.find(l => l.code === selectedLang || l.code.startsWith(selectedLang));
+  document.getElementById('currentLangLabel').textContent = match ? match.name : selectedLang.toUpperCase();
+}
+
+// Google Translate Integration Loader
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+(function() {
+  const gt = document.createElement('script');
+  gt.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  document.head.appendChild(gt);
+})();
+
+function triggerGoogleTranslate(langCode) {
+  selectedLang = langCode;
+  localStorage.setItem('app_lang_code', langCode);
+  updateLangLabel();
+
+  // Update cookie used by Google Translate Engine
+  const host = location.hostname;
+  document.cookie = `googtrans=/en/${langCode}; path=/; domain=${host}`;
+  document.cookie = `googtrans=/en/${langCode}; path=/;`;
+
+  // Apply directly to translation combo if ready
+  const combo = document.querySelector('.goog-te-combo');
+  if (combo) {
+    combo.value = langCode;
+    combo.dispatchEvent(new Event('change'));
+  } else {
+    // Reload page to force immediate full-page engine translation if framework hasn't attached
+    window.location.reload();
+  }
+}
+
+// ---- EDIT THESE TWO LINES ----
+let OWNER = "";
+let REPO  = "";
+(function () {
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    OWNER = host.split(".")[0];
+    const first = location.pathname.split("/").filter(Boolean)[0];
+    REPO = first || host;
+  }
+})();
+const PANEL_DIR = "/var/www/pterodactyl";
+
+const TYPES = {
+  blueprint: {
+    label: "Blueprints",
+    blurb: "For Pterodactyl 1.x with the Blueprint framework",
+    title: "Free Pterodactyl Blueprints",
+    sub: "Search for a blueprint, click it, and follow the setup steps.",
+    folder: "blueprints",
+    ext: ".blueprint",
+    empty: "Nothing here yet. The dev is too lazy to upload the blueprints.",
+    where: "Follow these steps on the server that runs your panel.",
+    fallback: [],
+    steps: b => [
+      ["Back up your panel", "Make a backup of your panel files and database before installing any extension."],
+      ["Check the file is safe", "Optional but recommended: scan the file with VirusTotal or ask an AI to review the code."],
+      ["Go to your panel folder", "Connect to your server over SSH and open the Pterodactyl directory." + cmdBlock(`cd ${PANEL_DIR}`)],
+      ["Download the blueprint", "Download it straight onto the server, or download it here and upload it to the panel folder yourself." +
+        cmdBlock(`wget -O ${b.file} "${b.url}"`) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Install it", "Run the Blueprint installer with the extension name." + cmdBlock(`blueprint -install ${b.id}`)],
+      ["Check it worked", "Open your admin panel and go to the Blueprint extensions page. The new extension should be listed. If something looks wrong, run the install command again and read any error it prints."]
+    ]
+  },
+  v2: {
+    label: "Pterodactyl v2 Extensions",
+    blurb: "For Pterodactyl 2.0 (built-in extensions, installed from a URL)",
+    title: "Free Pterodactyl v2 Extensions",
+    sub: "Search for an extension, click it, and follow the setup steps.",
+    folder: "extensions",
+    ext: "",
+    empty: "Nothing here yet. The dev is too lazy to upload the extensions.",
+    where: "Pterodactyl 2.0 is in beta. Try this on a test panel first.",
+    fallback: [],
+    steps: b => [
+      ["Back up your panel", "Make a backup of your panel files and database. Pterodactyl 2.0 is still in beta, so test on a copy of your panel first."],
+      ["Check the file is safe", "Optional but recommended: scan it with VirusTotal or ask an AI to review the code."],
+      ["Copy the extension URL", "v2 installs extensions from a URL, so you don't need to upload anything to the server." +
+        cmdBlock(b.url) + `<a class="btn" href="${b.url}">Download ${b.file}</a>`],
+      ["Open the extensions page", "Log in to your panel as an admin and open the Extensions page in the admin area."],
+      ["Install from URL", "Choose the option to install from a URL, paste the link from step 3 and confirm."],
+      ["Check it worked", "The extension should now be listed on the Extensions page. If it fails to install, the panel shows an error. A broken extension can't take the panel down, so you can just remove it."]
+    ]
+  }
+};
+
+const $ = id => document.getElementById(id);
+let current = null;
+let items = [];
+
+function pretty(file) { return file.replace(/\.[^.]+$/, ""); }
+
+function show(screen) {
+  $("choose").hidden = screen !== "choose";
+  $("home").hidden = screen !== "home";
+  $("guide").hidden = screen !== "guide";
+  $("main").classList.toggle("has-results", screen === "home" && items.length > 0);
+  window.scrollTo(0, 0);
+}
+
+function buildChoices() {
+  $("choices").innerHTML = "";
+  Object.keys(TYPES).forEach(key => {
+    const t = TYPES[key];
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = "<strong></strong><span></span>";
+    btn.querySelector("strong").textContent = t.label;
+    btn.querySelector("span").textContent = t.blurb;
+    btn.onclick = () => pick(key);
+    $("choices").appendChild(btn);
+  });
+}
+
+async function pick(key) {
+  current = TYPES[key];
+  items = [];
+  $("homeTitle").textContent = current.title;
+  $("homeSub").textContent = current.sub;
+  $("q").value = "";
+  $("list").innerHTML = "";
+  $("status").textContent = "Loading...";
+  show("home");
+  $("q").focus();
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${current.folder}`);
+    if (!res.ok) throw new Error(res.status);
+    const files = await res.json();
+    items = files
+      .filter(f => f.type === "file" && !f.name.startsWith(".") && !/^readme/i.test(f.name) &&
+        (!current.ext || f.name.toLowerCase().endsWith(current.ext)))
+      .map(f => ({ id: pretty(f.name), file: f.name, url: f.download_url }));
+  } catch (e) {
+    items = current.fallback.map(b => ({ id: b.name, file: b.name + current.ext, url: b.url }));
+  }
+  items.sort((a, b) => a.id.localeCompare(b.id));
+  render();
+}
+
+function render() {
+  const term = $("q").value.trim().toLowerCase();
+  const hits = items.filter(b => b.id.toLowerCase().includes(term));
+  const list = $("list");
+  list.innerHTML = "";
+  $("main").classList.toggle("has-results", hits.length > 0 && items.length > 0);
+  if (!items.length) {
+    $("status").textContent = current.empty;
+    return;
+  }
+  $("status").textContent = hits.length ? "" : "No results match that search.";
+  hits.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "item";
+    btn.innerHTML = `<span></span><small></small>`;
+    btn.firstChild.textContent = b.id;
+    btn.lastChild.textContent = b.file;
+    btn.onclick = () => openGuide(b);
+    list.appendChild(btn);
+  });
+}
+
+function cmdBlock(text) {
+  const safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return `<div class="cmd"><code>${safe}</code><button class="copy" data-copy="${safe}">Copy</button></div>`;
+}
+
+function openGuide(b) {
+  $("gname").textContent = b.id;
+  $("gsub").textContent = current.where;
+  $("steps").innerHTML = current.steps(b).map(s => `<li><strong>${s[0]}</strong><p>${s[1]}</p></li>`).join("");
+  show("guide");
+  $("main").classList.remove("has-results");
+}
+
+// Language Picker Modal Logic
+function renderLangList(filter = "") {
+  const container = $('langList');
+  container.innerHTML = "";
+  const query = filter.toLowerCase();
+  const filtered = ALL_LANGUAGES.filter(l => l.name.toLowerCase().includes(query) || l.code.toLowerCase().includes(query));
+
+  filtered.forEach(lang => {
+    const btn = document.createElement("button");
+    btn.className = `lang-item ${lang.code === selectedLang ? 'active' : ''}`;
+    btn.innerHTML = `<span>${lang.name}</span><small>${lang.code}</small>`;
+    btn.onclick = () => {
+      triggerGoogleTranslate(lang.code);
+      closeModal();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function openModal() {
+  $('langModal').hidden = false;
+  $('langSearch').value = "";
+  renderLangList();
+  $('langSearch').focus();
+}
+
+function closeModal() {
+  $('langModal').hidden = true;
+}
+
+$('openLangModal').onclick = openModal;
+$('closeLangModal').onclick = closeModal;
+$('langModal').onclick = e => { if (e.target === $('langModal')) closeModal(); };$('langSearch').addEventListener('input', e => renderLangList(e.target.value));
+
+$("back").onclick = () => { show("home"); render(); };
+$("backChoose").onclick = () => show("choose");
+$("q").addEventListener("input", render);
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-copy]");
+  if (!t) return;
+  const txt = new DOMParser().parseFromString(t.dataset.copy, "text/html").documentElement.textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    t.textContent = "Copied";
+    setTimeout(() => t.textContent = "Copy", 1500);
+  });
+});
+
+// Initialization
+updateLangLabel();
+buildChoices();
+show("choose");
+</script>
+</body>
+</html>
