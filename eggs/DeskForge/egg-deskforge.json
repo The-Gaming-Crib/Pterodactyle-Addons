@@ -6,7 +6,7 @@
   },
   "exported_at": "2026-11-27T00:00:00+00:00",
   "name": "DeskForge",
-  "author": "The Gaming Crib",
+  "author": "admin@thegamingcrib.net",
   "description": "Linux desktops over RDP / VNC / SSH (no web access). Pick distro + desktop environment. Container based, native speed, ARM + x86.",
   "features": [],
   "docker_images": {
