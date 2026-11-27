@@ -1,0 +1,103 @@
+{
+  "_comment": "WebDesk",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-11-27T00:00:00+00:00",
+  "name": "WebDesk",
+  "author": "you@example.com",
+  "description": "Linux desktops in your browser: many distros and desktop environments. Container based, native speed, ARM + x86.",
+  "features": [],
+  "docker_images": {
+    "Ubuntu 26.04 - XFCE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-26-xfce",
+    "Ubuntu 26.04 - MATE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-26-mate",
+    "Ubuntu 26.04 - LXQt": "ghcr.io/the-gaming-crib/webdesk:ubuntu-26-lxqt",
+    "Ubuntu 24.04 - XFCE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-24-xfce",
+    "Ubuntu 24.04 - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:ubuntu-24-kde",
+    "Ubuntu 24.04 - MATE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-24-mate",
+    "Ubuntu 24.04 - LXQt": "ghcr.io/the-gaming-crib/webdesk:ubuntu-24-lxqt",
+    "Ubuntu 22.04 - XFCE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-22-xfce",
+    "Ubuntu 20.04 - XFCE": "ghcr.io/the-gaming-crib/webdesk:ubuntu-20-xfce",
+    "Debian 13 - XFCE": "ghcr.io/the-gaming-crib/webdesk:debian-13-xfce",
+    "Debian 13 - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:debian-13-kde",
+    "Debian 13 - MATE": "ghcr.io/the-gaming-crib/webdesk:debian-13-mate",
+    "Debian 13 - LXQt": "ghcr.io/the-gaming-crib/webdesk:debian-13-lxqt",
+    "Debian 12 - XFCE": "ghcr.io/the-gaming-crib/webdesk:debian-12-xfce",
+    "Debian 12 - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:debian-12-kde",
+    "Debian 12 - MATE": "ghcr.io/the-gaming-crib/webdesk:debian-12-mate",
+    "Debian 12 - LXQt": "ghcr.io/the-gaming-crib/webdesk:debian-12-lxqt",
+    "Debian 11 - XFCE": "ghcr.io/the-gaming-crib/webdesk:debian-11-xfce",
+    "Kali Linux - XFCE": "ghcr.io/the-gaming-crib/webdesk:kali-xfce",
+    "Kali Linux - MATE": "ghcr.io/the-gaming-crib/webdesk:kali-mate",
+    "Parrot OS - XFCE": "ghcr.io/the-gaming-crib/webdesk:parrot-xfce",
+    "Linux Mint 22 - XFCE": "ghcr.io/the-gaming-crib/webdesk:mint-xfce",
+    "Linux Mint 22 - MATE": "ghcr.io/the-gaming-crib/webdesk:mint-mate",
+    "Devuan Daedalus - XFCE": "ghcr.io/the-gaming-crib/webdesk:devuan-xfce",
+    "Fedora 43 - XFCE": "ghcr.io/the-gaming-crib/webdesk:fedora-43-xfce",
+    "Fedora 43 - MATE": "ghcr.io/the-gaming-crib/webdesk:fedora-43-mate",
+    "Fedora 43 - LXQt": "ghcr.io/the-gaming-crib/webdesk:fedora-43-lxqt",
+    "Fedora 42 - XFCE": "ghcr.io/the-gaming-crib/webdesk:fedora-42-xfce",
+    "Fedora 42 - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:fedora-42-kde",
+    "Fedora 42 - MATE": "ghcr.io/the-gaming-crib/webdesk:fedora-42-mate",
+    "Fedora 42 - LXQt": "ghcr.io/the-gaming-crib/webdesk:fedora-42-lxqt",
+    "Fedora 41 - XFCE": "ghcr.io/the-gaming-crib/webdesk:fedora-41-xfce",
+    "Rocky Linux 9 - XFCE": "ghcr.io/the-gaming-crib/webdesk:rocky-9-xfce",
+    "AlmaLinux 9 - XFCE": "ghcr.io/the-gaming-crib/webdesk:alma-9-xfce",
+    "CentOS Stream 9 - XFCE": "ghcr.io/the-gaming-crib/webdesk:centos-9-xfce",
+    "Oracle Linux 9 - XFCE": "ghcr.io/the-gaming-crib/webdesk:oracle-9-xfce",
+    "Arch Linux (x86) - XFCE": "ghcr.io/the-gaming-crib/webdesk:arch-xfce",
+    "Arch Linux (x86) - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:arch-kde",
+    "Arch Linux (x86) - MATE": "ghcr.io/the-gaming-crib/webdesk:arch-mate",
+    "Arch Linux (x86) - LXQt": "ghcr.io/the-gaming-crib/webdesk:arch-lxqt",
+    "Arch Linux ARM - XFCE": "ghcr.io/the-gaming-crib/webdesk:arch-arm-xfce",
+    "Arch Linux ARM - KDE Plasma": "ghcr.io/the-gaming-crib/webdesk:arch-arm-kde",
+    "Arch Linux ARM - MATE": "ghcr.io/the-gaming-crib/webdesk:arch-arm-mate",
+    "Arch Linux ARM - LXQt": "ghcr.io/the-gaming-crib/webdesk:arch-arm-lxqt",
+    "Manjaro (x86) - XFCE": "ghcr.io/the-gaming-crib/webdesk:manjaro-xfce",
+    "CachyOS (x86) - XFCE": "ghcr.io/the-gaming-crib/webdesk:cachyos-xfce",
+    "Alpine 3.21 - XFCE": "ghcr.io/the-gaming-crib/webdesk:alpine-321-xfce",
+    "Alpine 3.20 - XFCE": "ghcr.io/the-gaming-crib/webdesk:alpine-320-xfce",
+    "Alpine Edge - XFCE": "ghcr.io/the-gaming-crib/webdesk:alpine-edge-xfce",
+    "openSUSE Tumbleweed - XFCE": "ghcr.io/the-gaming-crib/webdesk:opensuse-tw-xfce",
+    "openSUSE Leap 15.6 - XFCE": "ghcr.io/the-gaming-crib/webdesk:opensuse-leap-xfce",
+    "Void Linux - XFCE": "ghcr.io/the-gaming-crib/webdesk:void-xfce"
+  },
+  "file_denylist": [],
+  "startup": "bash /opt/start.sh",
+  "config": {
+    "files": "{}",
+    "startup": "{\"done\":\"Desktop ready\"}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/ash\nmkdir -p /mnt/server\necho ok\nexit 0",
+      "container": "alpine:3.20",
+      "entrypoint": "ash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Desktop password",
+      "description": "6-8 characters (VNC limit).",
+      "env_variable": "VNC_PASSWORD",
+      "default_value": "changeme",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|between:6,8",
+      "field_type": "text"
+    },
+    {
+      "name": "Resolution",
+      "description": "e.g. 1920x1080",
+      "env_variable": "RESOLUTION",
+      "default_value": "1600x900",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|regex:/^\\d{3,4}x\\d{3,4}$/",
+      "field_type": "text"
+    }
+  ]
+}
