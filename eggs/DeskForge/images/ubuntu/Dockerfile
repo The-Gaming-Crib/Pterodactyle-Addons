@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       kde)  apt-get install -y --no-install-recommends plasma-desktop kwin-x11 konsole dolphin kate ;; \
       mate) apt-get install -y --no-install-recommends mate-desktop-environment-core mate-terminal caja pluma ;; \
       lxqt) apt-get install -y --no-install-recommends lxqt-core qterminal pcmanfm-qt featherpad ;; \
+      gnome) apt-get install -y --no-install-recommends gnome-session ubuntu-session gnome-shell nautilus gnome-terminal gnome-text-editor gnome-shell-extension-ubuntu-dock gnome-shell-extension-appindicator yaru-theme-gtk yaru-theme-icon yaru-theme-gnome-shell ubuntu-wallpapers adwaita-icon-theme ;; \
     esac \
  && (apt-get install -y --no-install-recommends freerdp3-shadow-x11 winpr3-utils || apt-get install -y --no-install-recommends freerdp2-shadow-x11 winpr-utils || true) \
  && if [ "$FF" = mozilla ]; then \
@@ -22,6 +23,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     else apt-get install -y firefox-esr || apt-get install -y firefox; fi \
  && apt-get purge -y xfce4-screensaver light-locker 2>/dev/null; apt-get autoremove -y; rm -rf /var/lib/apt/lists/*
 RUN (id container >/dev/null 2>&1) || useradd -m -d /home/container -s /bin/bash container
+RUN if [ "$DE" = xfce ]; then \
+      apt-get update && (apt-get install -y --no-install-recommends yaru-theme-gtk yaru-theme-icon ubuntu-wallpapers plank dconf-gsettings-backend libglib2.0-bin || true) && rm -rf /var/lib/apt/lists/*; \
+    fi
+COPY common/ubuntu-style.sh /tmp/ubuntu-style.sh
+RUN if [ "$DE" = xfce ]; then sh /tmp/ubuntu-style.sh; fi; rm -f /tmp/ubuntu-style.sh
 ARG SESSION=startxfce4
 COPY common/start.sh /opt/start.sh
 COPY common/entrypoint.sh /entrypoint.sh
