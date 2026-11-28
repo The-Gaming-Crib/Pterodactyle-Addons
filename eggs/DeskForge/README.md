@@ -32,3 +32,7 @@ Open a terminal in the desktop and run `sudo -i` (or `sudo <command>`, or just `
 ## Games image (`Ubuntu 24.04 - XFCE + Games`)
 
 Includes Prism Launcher (Minecraft, imports CurseForge modpacks) with Java 17 and 21, and on ARM nodes Steam through FEX-Emu. Shortcuts appear on the desktop and in the Applications menu. The official CurseForge app has no Linux build, so Prism is used for CurseForge packs. There is no GPU: graphics are software rendered, so light games only.
+
+## Desktops
+
+Ubuntu images use an Ubuntu-style XFCE (Yaru theme, Ubuntu wallpaper, dock on the left). `Ubuntu 24.04 - GNOME` is the real Ubuntu desktop (experimental, heavy without a GPU; GNOME 26.04 is Wayland-only so there is no 26.04 GNOME). Other distros use XFCE only.
