@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Prism Launcher (Minecraft / CurseForge packs)
-Exec=env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 /opt/prism/AppRun
+Exec=env QT_QPA_PLATFORM=xcb LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe MESA_GL_VERSION_OVERRIDE=4.5 MESA_GLSL_VERSION_OVERRIDE=450 /opt/prism/AppRun
 Icon=prism-launcher
 Terminal=false
 Categories=Game;
