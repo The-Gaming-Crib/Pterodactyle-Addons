@@ -17,6 +17,7 @@ jobs:
           - { tag: ubuntu-26-mate, dir: ubuntu, file: debian, base: "ubuntu:26.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=mate" --build-arg "SESSION=mate-session"' }
           - { tag: ubuntu-26-lxqt, dir: ubuntu, file: debian, base: "ubuntu:26.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=lxqt" --build-arg "SESSION=startlxqt"' }
           - { tag: ubuntu-24-xfce, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
+          - { tag: ubuntu-24-xfce-games, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "GAMES=yes" --build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
           - { tag: ubuntu-24-kde, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=kde" --build-arg "SESSION=env KWIN_COMPOSE=N startplasma-x11"' }
           - { tag: ubuntu-24-mate, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=mate" --build-arg "SESSION=mate-session"' }
           - { tag: ubuntu-24-lxqt, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=lxqt" --build-arg "SESSION=startlxqt"' }

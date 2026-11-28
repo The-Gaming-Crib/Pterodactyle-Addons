@@ -2,11 +2,18 @@
 # DeskForge: Xvnc (X server) + desktop session, exposed ONLY via the protocols you pick: rdp, vnc, ssh. No web UI.
 export HOME=/home/container DISPLAY=:1
 UID_=$(id -u); GID_=$(id -g)
-# Wings runs us as an arbitrary uid that may collide with a system account (e.g. sshd, shell nologin),
-# which makes terminals close instantly. Put a real login entry for this uid first in /etc/passwd.
-if [ "$(getent passwd "$UID_" | cut -d: -f1)" != "container" ] && [ -w /etc/passwd ]; then
-  { echo "container:x:$UID_:$GID_:container:/home/container:/bin/bash"; cat /etc/passwd; } > /tmp/passwd.df && cat /tmp/passwd.df > /etc/passwd
+# Wings runs us as an arbitrary uid that may collide with a system account (e.g. sshd, shell nologin)
+# or have no passwd entry at all. Make sure this uid resolves to a real login entry named "container".
+if [ "$(getent passwd "$UID_" | cut -d: -f1)" != "container" ]; then
+  ENTRY="container:x:$UID_:$GID_:container:/home/container:/bin/bash"
+  TMPF="$HOME/.passwd.df"
+  if { echo "$ENTRY"; cat /etc/passwd; } > "$TMPF" 2>/dev/null && cat "$TMPF" > /etc/passwd 2>/dev/null; then :
+  elif echo "$ENTRY" >> /etc/passwd 2>/dev/null; then :
+  else echo "WARNING: cannot write /etc/passwd (uid $UID_ has no user entry); desktop may fail"; fi
+  rm -f "$TMPF"
 fi
+getent group "$GID_" >/dev/null 2>&1 || echo "container:x:$GID_:" >> /etc/group 2>/dev/null
+echo "Running as: $(getent passwd "$UID_" || echo "uid $UID_ unresolved")"
 export SHELL=/bin/bash
 export USER=$(id -un 2>/dev/null || echo container) LOGNAME=$USER
 export PATH="$PATH:/usr/sbin:/sbin:/usr/local/sbin"
@@ -18,6 +25,7 @@ for p in $(echo "$ACCESS" | tr '+,' '  '); do WANT[$p]=1; done
 [ "${WANT[all]}" = 1 ] && WANT[rdp]=1 && WANT[vnc]=1 && WANT[ssh]=1
 for p in rdp vnc ssh; do [ "${WANT[$p]}" = 1 ] && { PORT[$p]=$((BASE+n)); n=$((n+1)); }; done
 mkdir -p "$HOME/.vnc" "$HOME/Desktop" "$HOME/.cache" "$HOME/.ssh" "$HOME/.rdp" /tmp/.X11-unix 2>/dev/null
+for A in prism steam-fex; do [ -f /usr/share/applications/$A.desktop ] && [ ! -e "$HOME/Desktop/$A.desktop" ] && cp /usr/share/applications/$A.desktop "$HOME/Desktop/" && chmod +x "$HOME/Desktop/$A.desktop"; done
 printf '%s\n' "$PASS" | vncpasswd -f > "$HOME/.vnc/passwd"; chmod 600 "$HOME/.vnc/passwd"
 rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
 export MOZ_FAKE_NO_SANDBOX=1 XDG_RUNTIME_DIR="$HOME/.run" LIBGL_ALWAYS_SOFTWARE=1; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"

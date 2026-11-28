@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Steam (FEX)
+Exec=xfce4-terminal --hold -e steam-fex
+Icon=steam
+Categories=Game;
