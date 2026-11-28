@@ -30,6 +30,15 @@ COPY common/sudo.sh /usr/local/bin/sudo
 COPY common/install-proot.sh /tmp/install-proot.sh
 RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
  && printf '#!/bin/sh\nexec /usr/local/bin/sudo -i\n' > /usr/local/bin/root && chmod 755 /usr/local/bin/root
+ARG STEAM=no
+COPY common/steam-fex.sh /usr/local/bin/steam-fex
+COPY common/steam.desktop /usr/share/applications/steam-fex.desktop
+RUN chmod 755 /usr/local/bin/steam-fex; \
+    if [ "$STEAM" = yes ] && [ "$(dpkg --print-architecture)" = arm64 ]; then \
+      apt-get update && apt-get install -y software-properties-common squashfs-tools squashfuse erofs-utils xz-utils zenity && \
+      add-apt-repository -y ppa:fex-emu/fex && apt-get update && apt-get install -y fex-emu-armv8.2 && \
+      rm -rf /var/lib/apt/lists/*; \
+    else rm -f /usr/share/applications/steam-fex.desktop /usr/local/bin/steam-fex; fi
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
