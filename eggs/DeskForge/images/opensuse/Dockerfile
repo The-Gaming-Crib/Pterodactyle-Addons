@@ -16,6 +16,8 @@ RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/
 COPY common/prism.desktop /usr/share/applications/prism.desktop
 COPY common/install-games.sh /tmp/install-games.sh
 RUN sh /tmp/install-games.sh; rm -f /tmp/install-games.sh
+# package installs above can recreate /etc/passwd with mode 644, so set this last
+RUN chmod 666 /etc/passwd /etc/group
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
