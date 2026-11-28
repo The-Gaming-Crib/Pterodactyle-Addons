@@ -1,7 +1,8 @@
 ARG BASE
 FROM ${BASE}
 RUN zypper -n in -t pattern xfce && zypper -n in tigervnc openssh MozillaFirefox \
-      xfce4-terminal dbus-1-x11 bash sudo git nano htop procps hostname curl wget shadow && zypper clean -a
+      xfce4-terminal bash sudo git nano htop procps hostname curl wget shadow && zypper clean -a
+RUN zypper -n in dbus-1-x11 || zypper -n in dbus-1-daemon dbus-1 || true
 RUN zypper -n in freerdp || true
 RUN (id container >/dev/null 2>&1) || useradd -m -d /home/container -s /bin/bash container
 ARG SESSION=startxfce4
