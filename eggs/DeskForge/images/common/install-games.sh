@@ -5,16 +5,16 @@ set -u
 if command -v apk >/dev/null 2>&1; then echo "games: skipped on Alpine (musl)"; rm -f /usr/share/applications/prism.desktop; exit 0; fi
 if command -v apt-get >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive; apt-get update
-  apt-get install -y --no-install-recommends libgl1-mesa-dri libegl1 libxcb-cursor0 libxcb-xinerama0 zenity xz-utils squashfs-tools wget ca-certificates
+  apt-get install -y --no-install-recommends libgl1 libglx-mesa0 libgl1-mesa-dri libegl1 libglu1-mesa mesa-vulkan-drivers libvulkan1 mesa-utils libxcb-cursor0 libxcb-xinerama0 zenity xz-utils squashfs-tools wget ca-certificates
   apt-get install -y --no-install-recommends openjdk-21-jre || apt-get install -y --no-install-recommends openjdk-17-jre
   apt-get install -y --no-install-recommends openjdk-17-jre || true
   rm -rf /var/lib/apt/lists/*
 elif command -v dnf >/dev/null 2>&1; then
-  dnf install -y mesa-dri-drivers mesa-libEGL xcb-util-cursor zenity xz wget squashfs-tools --setopt=install_weak_deps=False || true
+  dnf install -y mesa-dri-drivers mesa-libEGL mesa-libGL mesa-vulkan-drivers vulkan-loader glx-utils xcb-util-cursor zenity xz wget squashfs-tools --setopt=install_weak_deps=False || true
   dnf install -y java-21-openjdk || dnf install -y java-17-openjdk || true
   dnf install -y java-17-openjdk || true; dnf clean all
 elif command -v pacman >/dev/null 2>&1; then
-  pacman -S --noconfirm --needed mesa libglvnd xcb-util-cursor zenity xz wget squashfs-tools jre21-openjdk jre17-openjdk || true; pacman -Scc --noconfirm
+  pacman -S --noconfirm --needed mesa libglvnd vulkan-swrast vulkan-icd-loader mesa-utils xcb-util-cursor zenity xz wget squashfs-tools jre21-openjdk jre17-openjdk || true; pacman -Scc --noconfirm
 elif command -v zypper >/dev/null 2>&1; then
   zypper -n install Mesa-dri Mesa-libEGL1 libxcb-cursor0 zenity xz wget squashfs java-21-openjdk java-17-openjdk || true; zypper clean -a
 elif command -v xbps-install >/dev/null 2>&1; then
