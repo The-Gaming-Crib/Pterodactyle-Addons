@@ -15,4 +15,5 @@ if [ ! -x "$S/steam.sh" ]; then
   rm -rf "$T"
 fi
 export LIBGL_ALWAYS_SOFTWARE=1 STEAM_RUNTIME=0
-exec FEXBash "'$S/steam.sh' -no-cef-sandbox -cef-disable-gpu -cef-disable-gpu-compositing"
+# FEXBash treats its argument as a script file name, so run bash through FEXInterpreter explicitly.
+exec FEXInterpreter /usr/bin/bash -c "'$S/steam.sh' -no-cef-sandbox -cef-disable-gpu -cef-disable-gpu-compositing"
