@@ -2,11 +2,18 @@
 # DeskForge: Xvnc (X server) + desktop session, exposed ONLY via the protocols you pick: rdp, vnc, ssh. No web UI.
 export HOME=/home/container DISPLAY=:1
 UID_=$(id -u); GID_=$(id -g)
-# Wings runs us as an arbitrary uid that may collide with a system account (e.g. sshd, shell nologin),
-# which makes terminals close instantly. Put a real login entry for this uid first in /etc/passwd.
-if [ "$(getent passwd "$UID_" | cut -d: -f1)" != "container" ] && [ -w /etc/passwd ]; then
-  { echo "container:x:$UID_:$GID_:container:/home/container:/bin/bash"; cat /etc/passwd; } > /tmp/passwd.df && cat /tmp/passwd.df > /etc/passwd
+# Wings runs us as an arbitrary uid that may collide with a system account (e.g. sshd, shell nologin)
+# or have no passwd entry at all. Make sure this uid resolves to a real login entry named "container".
+if [ "$(getent passwd "$UID_" | cut -d: -f1)" != "container" ]; then
+  ENTRY="container:x:$UID_:$GID_:container:/home/container:/bin/bash"
+  TMPF="$HOME/.passwd.df"
+  if { echo "$ENTRY"; cat /etc/passwd; } > "$TMPF" 2>/dev/null && cat "$TMPF" > /etc/passwd 2>/dev/null; then :
+  elif echo "$ENTRY" >> /etc/passwd 2>/dev/null; then :
+  else echo "WARNING: cannot write /etc/passwd (uid $UID_ has no user entry); desktop may fail"; fi
+  rm -f "$TMPF"
 fi
+getent group "$GID_" >/dev/null 2>&1 || echo "container:x:$GID_:" >> /etc/group 2>/dev/null
+echo "Running as: $(getent passwd "$UID_" || echo "uid $UID_ unresolved")"
 export SHELL=/bin/bash
 export USER=$(id -un 2>/dev/null || echo container) LOGNAME=$USER
 export PATH="$PATH:/usr/sbin:/sbin:/usr/local/sbin"

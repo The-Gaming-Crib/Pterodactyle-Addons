@@ -7,7 +7,7 @@ RUN (id container >/dev/null 2>&1) || useradd -m -d /home/container -s /bin/bash
 ARG SESSION=startxfce4
 COPY common/start.sh /opt/start.sh
 COPY common/entrypoint.sh /entrypoint.sh
-RUN chmod +x /opt/start.sh /entrypoint.sh && chmod 666 /etc/passwd && echo "$SESSION" > /opt/session
+RUN chmod +x /opt/start.sh /entrypoint.sh && chmod 666 /etc/passwd /etc/group && echo "$SESSION" > /opt/session
 COPY common/sudo.sh /usr/local/bin/sudo
 COPY common/install-proot.sh /tmp/install-proot.sh
 RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
