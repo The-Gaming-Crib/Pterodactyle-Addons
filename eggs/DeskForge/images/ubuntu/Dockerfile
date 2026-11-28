@@ -30,15 +30,24 @@ COPY common/sudo.sh /usr/local/bin/sudo
 COPY common/install-proot.sh /tmp/install-proot.sh
 RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
  && printf '#!/bin/sh\nexec /usr/local/bin/sudo -i\n' > /usr/local/bin/root && chmod 755 /usr/local/bin/root
-ARG STEAM=no
+ARG GAMES=no
 COPY common/steam-fex.sh /usr/local/bin/steam-fex
 COPY common/steam.desktop /usr/share/applications/steam-fex.desktop
+COPY common/prism.desktop /usr/share/applications/prism.desktop
 RUN chmod 755 /usr/local/bin/steam-fex; \
-    if [ "$STEAM" = yes ] && [ "$(dpkg --print-architecture)" = arm64 ]; then \
-      apt-get update && apt-get install -y software-properties-common squashfs-tools squashfuse erofs-utils xz-utils zenity && \
-      add-apt-repository -y ppa:fex-emu/fex && apt-get update && apt-get install -y fex-emu-armv8.2 && \
+    if [ "$GAMES" = yes ]; then \
+      apt-get update && apt-get install -y --no-install-recommends libgl1-mesa-dri libegl1 libxcb-cursor0 libxcb-xinerama0 \
+        openjdk-21-jre openjdk-17-jre zenity xz-utils squashfs-tools && \
+      A=$(uname -m) && \
+      wget -q "https://github.com/PrismLauncher/PrismLauncher/releases/download/11.1.1/PrismLauncher-Linux-$A.AppImage" -O /tmp/prism.AppImage && \
+      chmod +x /tmp/prism.AppImage && cd /opt && /tmp/prism.AppImage --appimage-extract >/dev/null && mv squashfs-root prism && \
+      chmod -R a+rX /opt/prism && rm -f /tmp/prism.AppImage && cd / ; \
+      if [ "$(dpkg --print-architecture)" = arm64 ]; then \
+        apt-get install -y software-properties-common erofs-utils squashfuse && \
+        add-apt-repository -y ppa:fex-emu/fex && apt-get update && apt-get install -y fex-emu-armv8.2; \
+      else rm -f /usr/share/applications/steam-fex.desktop /usr/local/bin/steam-fex; fi; \
       rm -rf /var/lib/apt/lists/*; \
-    else rm -f /usr/share/applications/steam-fex.desktop /usr/local/bin/steam-fex; fi
+    else rm -f /usr/share/applications/steam-fex.desktop /usr/local/bin/steam-fex /usr/share/applications/prism.desktop; fi
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container

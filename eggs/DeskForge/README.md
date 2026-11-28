@@ -28,3 +28,7 @@ Status: untested. RDP depends on the distro shipping a FreeRDP shadow server; im
 ## Root inside the desktop
 
 Open a terminal in the desktop and run `sudo -i` (or `sudo <command>`, or just `root`). You get a root shell in a private copy of the OS built with `proot`, so `apt`/`pacman`/`dnf`/`apk` installs work. The first use copies the OS into `~/.rootfs` (one time, takes a minute). Installed packages survive restarts. It is root only inside that sandbox and has no access to the host or other servers.
+
+## Games image (`Ubuntu 24.04 - XFCE + Games`)
+
+Includes Prism Launcher (Minecraft, imports CurseForge modpacks) with Java 17 and 21, and on ARM nodes Steam through FEX-Emu. Shortcuts appear on the desktop and in the Applications menu. The official CurseForge app has no Linux build, so Prism is used for CurseForge packs. There is no GPU: graphics are software rendered, so light games only.
