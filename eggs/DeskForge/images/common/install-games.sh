@@ -32,5 +32,7 @@ if [ -s /tmp/prism.AppImage ]; then
   chmod -R a+rX /opt/prism 2>/dev/null
 fi
 rm -f /tmp/prism.AppImage
+I=$(ls /opt/prism/*.png 2>/dev/null | head -1); [ -z "$I" ] && I=$(readlink -f /opt/prism/.DirIcon 2>/dev/null)
+[ -f "$I" ] && { mkdir -p /usr/share/pixmaps; cp "$I" /usr/share/pixmaps/prism-launcher.png; }
 [ -x /opt/prism/AppRun ] || { echo "games: Prism install failed"; rm -f /usr/share/applications/prism.desktop; }
 exit 0
