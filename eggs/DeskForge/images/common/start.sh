@@ -2,9 +2,12 @@
 # DeskForge: Xvnc (X server) + desktop session, exposed ONLY via the protocols you pick: rdp, vnc, ssh. No web UI.
 export HOME=/home/container DISPLAY=:1
 UID_=$(id -u); GID_=$(id -g)
-if ! getent passwd "$UID_" >/dev/null 2>&1 && [ -w /etc/passwd ]; then
-  echo "container:x:$UID_:$GID_:container:/home/container:/bin/bash" >> /etc/passwd
+# Wings runs us as an arbitrary uid that may collide with a system account (e.g. sshd, shell nologin),
+# which makes terminals close instantly. Put a real login entry for this uid first in /etc/passwd.
+if [ "$(getent passwd "$UID_" | cut -d: -f1)" != "container" ] && [ -w /etc/passwd ]; then
+  { echo "container:x:$UID_:$GID_:container:/home/container:/bin/bash"; cat /etc/passwd; } > /tmp/passwd.df && cat /tmp/passwd.df > /etc/passwd
 fi
+export SHELL=/bin/bash
 export USER=$(id -un 2>/dev/null || echo container) LOGNAME=$USER
 export PATH="$PATH:/usr/sbin:/sbin:/usr/local/sbin"
 BASE="${SERVER_PORT:-3389}"; RES="${RESOLUTION:-1600x900}"; PASS="${DESKTOP_PASSWORD:-changeme}"
