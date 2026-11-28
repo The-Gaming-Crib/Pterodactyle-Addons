@@ -26,6 +26,7 @@ for p in $(echo "$ACCESS" | tr '+,' '  '); do WANT[$p]=1; done
 for p in rdp vnc ssh; do [ "${WANT[$p]}" = 1 ] && { PORT[$p]=$((BASE+n)); n=$((n+1)); }; done
 mkdir -p "$HOME/.vnc" "$HOME/Desktop" "$HOME/.cache" "$HOME/.ssh" "$HOME/.rdp" /tmp/.X11-unix 2>/dev/null
 for A in prism steam-fex; do [ -f /usr/share/applications/$A.desktop ] && [ ! -e "$HOME/Desktop/$A.desktop" ] && cp /usr/share/applications/$A.desktop "$HOME/Desktop/" && chmod +x "$HOME/Desktop/$A.desktop"; done
+( sleep 8; for F in "$HOME"/Desktop/*.desktop; do [ -f "$F" ] || continue; C=$(sha256sum "$F" | cut -d" " -f1); dbus-run-session -- sh -c "gio set -t string '$F' metadata::xfce-exe-checksum '$C'; gio set '$F' metadata::trusted true" >/dev/null 2>&1; done ) &
 printf '%s\n' "$PASS" | vncpasswd -f > "$HOME/.vnc/passwd"; chmod 600 "$HOME/.vnc/passwd"
 rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
 export MOZ_FAKE_NO_SANDBOX=1 XDG_RUNTIME_DIR="$HOME/.run" LIBGL_ALWAYS_SOFTWARE=1; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
@@ -37,6 +38,7 @@ for i in $(seq 1 30); do [ -S /tmp/.X11-unix/X1 ] && break; sleep 0.5; done
 [ -S /tmp/.X11-unix/X1 ] || { echo "Xvnc failed:"; cat "$HOME/.vnc/xvnc.log"; exit 1; }
 SESSION="$(cat /opt/session)"
 if command -v dbus-launch >/dev/null; then bash -c "dbus-launch --exit-with-session $SESSION" >"$HOME/.vnc/desktop.log" 2>&1 &
+elif command -v dbus-run-session >/dev/null; then bash -c "dbus-run-session -- $SESSION" >"$HOME/.vnc/desktop.log" 2>&1 &
 else bash -c "$SESSION" >"$HOME/.vnc/desktop.log" 2>&1 & fi
 PIDS="$PIDS $!"; OK=0
 [ -n "${PORT[vnc]}" ] && { echo "VNC  listening on port ${PORT[vnc]} (password: Desktop password, first 8 chars)"; OK=1; }

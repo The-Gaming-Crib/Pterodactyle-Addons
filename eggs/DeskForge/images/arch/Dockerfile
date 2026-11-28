@@ -1,6 +1,7 @@
 ARG BASE
 FROM ${BASE}
 ARG DE=xfce
+RUN sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
 RUN case "$DE" in \
       xfce) P="xfce4 xfce4-terminal thunar mousepad" ;; \
       kde)  P="plasma-desktop plasma-x11-session konsole dolphin kate" ;; \
