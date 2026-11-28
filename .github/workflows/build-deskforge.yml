@@ -15,7 +15,6 @@ jobs:
         include:
           - { tag: ubuntu-26-xfce, dir: ubuntu, file: debian, base: "ubuntu:26.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
           - { tag: ubuntu-24-xfce, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
-          - { tag: ubuntu-24-xfce-games, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "GAMES=yes" --build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
           - { tag: ubuntu-24-gnome, dir: ubuntu, file: debian, base: "ubuntu:24.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=gnome" --build-arg "SESSION=env GNOME_SHELL_SESSION_MODE=ubuntu XDG_CURRENT_DESKTOP=ubuntu:GNOME XDG_SESSION_TYPE=x11 gnome-session --session=ubuntu"' }
           - { tag: ubuntu-22-xfce, dir: ubuntu, file: debian, base: "ubuntu:22.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }
           - { tag: ubuntu-20-xfce, dir: ubuntu, file: debian, base: "ubuntu:20.04", plat: "linux/amd64,linux/arm64", args: '--build-arg "FF=mozilla" --build-arg "DE=xfce" --build-arg "SESSION=startxfce4"' }

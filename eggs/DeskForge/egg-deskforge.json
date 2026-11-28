@@ -12,7 +12,6 @@
   "docker_images": {
     "Ubuntu 26.04 - Ubuntu-style (XFCE)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-26-xfce",
     "Ubuntu 24.04 - Ubuntu-style (XFCE)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-24-xfce",
-    "Ubuntu 24.04 - XFCE + Games (Prism/Minecraft, Steam on ARM)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-24-xfce-games",
     "Ubuntu 24.04 - GNOME (real Ubuntu desktop, experimental, heavy)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-24-gnome",
     "Ubuntu 22.04 - Ubuntu-style (XFCE)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-22-xfce",
     "Ubuntu 20.04 - Ubuntu-style (XFCE)": "ghcr.io/the-gaming-crib/deskforge:ubuntu-20-xfce",

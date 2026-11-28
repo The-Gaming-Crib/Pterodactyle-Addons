@@ -36,7 +36,7 @@ COPY common/sudo.sh /usr/local/bin/sudo
 COPY common/install-proot.sh /tmp/install-proot.sh
 RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
  && printf '#!/bin/sh\nexec /usr/local/bin/sudo -i\n' > /usr/local/bin/root && chmod 755 /usr/local/bin/root
-ARG GAMES=no
+ARG GAMES=yes
 COPY common/steam-fex.sh /usr/local/bin/steam-fex
 COPY common/steam.desktop /usr/share/applications/steam-fex.desktop
 COPY common/prism.desktop /usr/share/applications/prism.desktop

@@ -12,6 +12,9 @@ COPY common/sudo.sh /usr/local/bin/sudo
 COPY common/install-proot.sh /tmp/install-proot.sh
 RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
  && printf '#!/bin/sh\nexec /usr/local/bin/sudo -i\n' > /usr/local/bin/root && chmod 755 /usr/local/bin/root
+COPY common/prism.desktop /usr/share/applications/prism.desktop
+COPY common/install-games.sh /tmp/install-games.sh
+RUN sh /tmp/install-games.sh; rm -f /tmp/install-games.sh
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
