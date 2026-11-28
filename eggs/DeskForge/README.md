@@ -24,3 +24,7 @@ Safest setup: `Access = ssh`, then `ssh -p PORT -L 5901:localhost:5901 container
 4. Server: 1+ ports, 2 GB+ RAM (KDE 3 GB+).
 
 Status: untested. RDP depends on the distro shipping a FreeRDP shadow server; images without it print a warning and still serve VNC/SSH.
+
+## Root inside the desktop
+
+Open a terminal in the desktop and run `sudo -i` (or `sudo <command>`, or just `root`). You get a root shell in a private copy of the OS built with `proot`, so `apt`/`pacman`/`dnf`/`apk` installs work. The first use copies the OS into `~/.rootfs` (one time, takes a minute). Installed packages survive restarts. It is root only inside that sandbox and has no access to the host or other servers.

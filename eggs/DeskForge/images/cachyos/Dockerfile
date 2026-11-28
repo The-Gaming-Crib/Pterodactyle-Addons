@@ -15,6 +15,10 @@ ARG SESSION=startxfce4
 COPY common/start.sh /opt/start.sh
 COPY common/entrypoint.sh /entrypoint.sh
 RUN chmod +x /opt/start.sh /entrypoint.sh && chmod 666 /etc/passwd && echo "$SESSION" > /opt/session
+COPY common/sudo.sh /usr/local/bin/sudo
+COPY common/install-proot.sh /tmp/install-proot.sh
+RUN sh /tmp/install-proot.sh; rm -f /tmp/install-proot.sh; chmod 755 /usr/local/bin/sudo \
+ && printf '#!/bin/sh\nexec /usr/local/bin/sudo -i\n' > /usr/local/bin/root && chmod 755 /usr/local/bin/root
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
