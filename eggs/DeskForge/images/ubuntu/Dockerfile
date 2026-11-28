@@ -51,6 +51,8 @@ RUN chmod 755 /usr/local/bin/steam-fex; \
       rm -rf /var/lib/apt/lists/*; \
     else rm -f /usr/share/applications/steam-fex.desktop /usr/local/bin/steam-fex /usr/share/applications/prism.desktop; fi; \
     rm -f /tmp/install-games.sh
+# package installs above can recreate /etc/passwd with mode 644, so set this last
+RUN chmod 666 /etc/passwd /etc/group
 USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
